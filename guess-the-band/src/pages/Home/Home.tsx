@@ -1,5 +1,7 @@
+import { useNavigate } from "react-router-dom";
 
 const Home: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-hidden font-display">
       {/* Background SVG */}
@@ -44,20 +46,27 @@ const Home: React.FC = () => {
               Guess The Band
             </h1>
             <p className="text-white text-base font-normal leading-normal pb-6 pt-1 px-4 max-w-md mx-auto">
-              Adivinhe a banda. Teste seus conhecimentos musicais e suba no ranking.
+              Adivinhe a banda. Teste seus conhecimentos musicais e suba no
+              ranking.
             </p>
 
             <div className="flex flex-col sm:flex-row px-4 py-3 justify-center gap-4">
-              <button className="flex items-center justify-center w-full sm:w-auto h-12 px-8 bg-primary text-white font-bold rounded-lg transition-transform hover:scale-105">
+              <button
+                className="flex items-center justify-center w-full sm:w-auto h-12 px-8 bg-primary text-white font-bold rounded-lg transition-transform hover:scale-105"
+                onClick={() => navigate("/game")}
+              >
                 Jogar Agora
               </button>
+
               <button className="flex items-center justify-center w-full sm:w-auto h-12 px-8 border border-primary text-white font-bold rounded-lg hover:bg-primary/20 transition-colors">
                 Modo Temático
               </button>
             </div>
 
             <div className="mt-4 px-4">
-              <p className="text-white/80 text-sm mb-3">Escolha uma categoria:</p>
+              <p className="text-white/80 text-sm mb-3">
+                Escolha uma categoria:
+              </p>
               <div className="flex flex-wrap justify-center gap-3">
                 {["Rock", "Pop", "Indie", "80s"].map((cat) => (
                   <a
@@ -82,24 +91,36 @@ const Home: React.FC = () => {
 
         <footer className="flex flex-col gap-6 px-5 py-10 text-center">
           <div className="flex flex-wrap items-center justify-center gap-6">
-            <a className="text-[#909acb] text-sm hover:text-white transition-colors" href="#">
+            <a
+              className="text-[#909acb] text-sm hover:text-white transition-colors"
+              href="#"
+            >
               Privacy Policy
             </a>
-            <a className="text-[#909acb] text-sm hover:text-white transition-colors" href="#">
+            <a
+              className="text-[#909acb] text-sm hover:text-white transition-colors"
+              href="#"
+            >
               Terms of Service
             </a>
           </div>
 
           <div className="flex flex-wrap justify-center gap-6">
             {["Twitter", "Instagram", "Facebook"].map((social) => (
-              <a key={social} href="#" className="text-[#909acb] hover:text-white transition-colors">
+              <a
+                key={social}
+                href="#"
+                className="text-[#909acb] hover:text-white transition-colors"
+              >
                 <span className="sr-only">{social}</span>
                 <i className="material-symbols-outlined">share</i>
               </a>
             ))}
           </div>
 
-          <p className="text-[#909acb] text-sm">© 2025 Guess The Band. All rights reserved.</p>
+          <p className="text-[#909acb] text-sm">
+            © 2025 Guess The Band. All rights reserved.
+          </p>
         </footer>
       </div>
     </div>
