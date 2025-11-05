@@ -58,7 +58,10 @@ const Home: React.FC = () => {
                 Jogar Agora
               </button>
 
-              <button className="flex items-center justify-center w-full sm:w-auto h-12 px-8 border border-primary text-white font-bold rounded-lg hover:bg-primary/20 transition-colors">
+              <button
+                className="flex items-center justify-center w-full sm:w-auto h-12 px-8 border border-primary text-white font-bold rounded-lg hover:bg-primary/20 transition-colors"
+                onClick={() => navigate("/modo-tematico")}
+              >
                 Modo Temático
               </button>
             </div>

@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { fetchAlbums } from "../../api/Music";
 import type { Album } from "../../types/AlbumType/Album";
+import { fetchBadOmensAlbums } from "../../api/Artist";
+
+
+interface GameProps {
+  thematic?: boolean;
+}
 
 const maxAttempts = 5;
 
-const Game: React.FC = () => {
+const Game: React.FC<GameProps> = ({ thematic }) => {
   const [attemptsLeft, setAttemptsLeft] = useState(maxAttempts);
   const [guess, setGuess] = useState("");
   const [blurLevel, setBlurLevel] = useState(32);
@@ -16,17 +22,17 @@ const Game: React.FC = () => {
 
   // Função para carregar novo álbum
   const loadAlbum = async () => {
-    setLoading(true);
-    const albums = await fetchAlbums("rock");
-    const randomAlbum = albums[Math.floor(Math.random() * albums.length)];
-    setAlbum(randomAlbum);
-    setAttemptsLeft(maxAttempts);
-    setBlurLevel(32);
-    setFeedback(null);
-    setGuess("");
-    setHint("");
-    setLoading(false);
-  };
+  setLoading(true);
+  const albums = thematic ? await fetchBadOmensAlbums() : await fetchAlbums("rock"); // Chama a função que já retorna os álbuns
+  const randomAlbum = albums[Math.floor(Math.random() * albums.length)]; // Escolhe um aleatório
+  setAlbum(randomAlbum);
+  setAttemptsLeft(maxAttempts);
+  setBlurLevel(32);
+  setFeedback(null);
+  setGuess("");
+  setHint("");
+  setLoading(false);
+};
 
   useEffect(() => {
     loadAlbum();
