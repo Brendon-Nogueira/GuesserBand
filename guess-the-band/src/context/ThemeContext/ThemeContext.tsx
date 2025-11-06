@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 
-type Theme = 'dark' | 'light' | 'system';
+type Theme = "dark" | "light" | "system";
 
 interface ThemeState {
   theme: Theme;
@@ -10,8 +10,8 @@ interface ThemeState {
 const ThemeContext = React.createContext<ThemeState | undefined>(undefined);
 
 const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const storageKey = 'vite-ui-theme';
-  const defaultTheme: Theme = 'dark'; // Padrão 'dark' como no HTML original
+  const storageKey = "vite-ui-theme";
+  const defaultTheme: Theme = "dark";
 
   const [theme, setThemeState] = useState<Theme>(() => {
     const savedTheme = localStorage.getItem(storageKey) as Theme;
@@ -25,28 +25,28 @@ const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
+    root.classList.remove("light", "dark");
 
-    // Se for 'system' ou for a primeira carga e o tema não for 'dark' ou 'light'
-    if (theme === 'system' || (theme === defaultTheme && !localStorage.getItem(storageKey))) {
-        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        root.classList.add(systemTheme);
-        return;
+    if (theme === "system" || (theme === defaultTheme && !localStorage.getItem(storageKey))) {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      root.classList.add(systemTheme);
+      return;
     }
-    
-    root.classList.add(theme);
 
+    root.classList.add(theme);
   }, [theme]);
 
   const value = { theme, setTheme };
 
-  return <ThemeContext.ThemeProvider value={value}>{children}</ThemeContext.ThemeProvider>;
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };
 
 const useTheme = () => {
   const context = React.useContext(ThemeContext);
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    throw new Error("useTheme must be used within a ThemeProvider");
   }
   return context;
 };
+
+export { ThemeProvider, useTheme };
