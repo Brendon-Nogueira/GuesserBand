@@ -1,17 +1,14 @@
 import { useNavigate } from "react-router-dom";
-//import { TwitterIcon, InstagramIcon, FacebookIcon } from "../../components/IconsComponents";
+import { ARTIST_MAP } from "../../api/Music";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
 
-  
-
-
-// const socialIcons: Record<string, React.FC<React.SVGProps<SVGSVGElement>>> = {
-//   Twitter: TwitterIcon,
-//   Instagram: InstagramIcon,
-//   Facebook: FacebookIcon,
-// };
+  const handleSelectGenre = (genre: string) => {
+    // salva o gênero no localStorage
+    localStorage.setItem("selectedGenre", genre.toLowerCase());
+    navigate("/guess-the-band/game");
+  };
 
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-hidden font-display">
@@ -82,14 +79,14 @@ const Home: React.FC = () => {
                 Escolha uma categoria:
               </p>
               <div className="flex flex-wrap justify-center gap-3">
-                {["Rock", "Pop", "Indie", "80s"].map((cat) => (
-                  <a
-                    key={cat}
-                    href="#"
+                {Object.keys(ARTIST_MAP).map((genre) => (
+                  <button
+                    key={genre}
+                    onClick={() => handleSelectGenre(genre)}
                     className="px-4 py-2 rounded-full border border-white/30 text-white/80 text-sm hover:bg-white/10 hover:border-white/50 transition-colors"
                   >
-                    {cat}
-                  </a>
+                    {genre.toUpperCase()}
+                  </button>
                 ))}
               </div>
             </div>
