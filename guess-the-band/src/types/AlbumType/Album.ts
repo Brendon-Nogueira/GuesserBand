@@ -2,11 +2,11 @@
  * Define a estrutura de dados de um álbum/música que o jogo usará.
  */
 export interface Album {
-  mbid: string; // MusicBrainz ID (chave para buscar no Cover Art Archive)
-  artist: string; // Nome da Banda (a resposta correta)
+  mbid: string; 
+  artist: string; 
   albumTitle: string;
   releaseYear: number;
-  coverArtUrl: string; // O link direto para a imagem
+  coverArtUrl: string; 
   genre: string;
 }
 

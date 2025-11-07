@@ -11,7 +11,9 @@ async function getSpotifyToken(): Promise<string> {
 
 export async function fetchBadOmensAlbums(): Promise<Album[]> {
   const token = await getSpotifyToken();
-  const artistId = "3ZztVuWxHzNpl0THurTFCv"; // ID do Bad Omens no Spotify
+  // const artistId = "3ZztVuWxHzNpl0THurTFCv"; 
+
+  const artistId = "3Ri4H12KFyu98LMjSoij5V" // ID do Bad Omens no Spotify
 
   const response = await fetch(
     `https://api.spotify.com/v1/artists/${artistId}/albums?include_groups=album,single&limit=50`,
@@ -30,6 +32,6 @@ export async function fetchBadOmensAlbums(): Promise<Album[]> {
     albumTitle: item.name,
     releaseYear: parseInt(item.release_date.split("-")[0]),
     coverArtUrl: item.images[0]?.url || "",
-    genre: "Metalcore",
+    genre: ["metalcore", "djent", "metal", "mathcore", "post-hardcore", "deathcore"],
   }));
 }

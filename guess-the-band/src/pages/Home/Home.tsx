@@ -1,7 +1,18 @@
 import { useNavigate } from "react-router-dom";
+import { TwitterIcon, InstagramIcon, FacebookIcon } from "../../components/IconsComponents";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+
+  
+
+
+const socialIcons: Record<string, React.FC<React.SVGProps<SVGSVGElement>>> = {
+  Twitter: TwitterIcon,
+  Instagram: InstagramIcon,
+  Facebook: FacebookIcon,
+};
+
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-hidden font-display">
       {/* Background SVG */}
@@ -53,14 +64,14 @@ const Home: React.FC = () => {
             <div className="flex flex-col sm:flex-row px-4 py-3 justify-center gap-4">
               <button
                 className="flex items-center justify-center w-full sm:w-auto h-12 px-8 bg-primary text-white font-bold rounded-lg transition-transform hover:scale-105"
-                onClick={() => navigate("/game")}
+                onClick={() => navigate("/guess-the-band/game")}
               >
                 Jogar Agora
               </button>
 
               <button
                 className="flex items-center justify-center w-full sm:w-auto h-12 px-8 border border-primary text-white font-bold rounded-lg hover:bg-primary/20 transition-colors"
-                onClick={() => navigate("/modo-tematico")}
+                onClick={() => navigate("/guess-the-band/modo-tematico")}
               >
                 Modo Temático
               </button>

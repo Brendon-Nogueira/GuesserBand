@@ -22,13 +22,16 @@ export async function fetchAlbums(query: string): Promise<Album[]> {
   );
 
   const data = await response.json();
-  //console.log(data)
+  console.log(data.albums.items)
+   
   return data.albums.items.map((item: any) => ({
     mbid: item.id,
     artist: item.artists[0].name,
     albumTitle: item.name,
     releaseYear: parseInt(item.release_date.split('-')[0]),
     coverArtUrl: item.images[0]?.url || '',
-    genre: 'Metal', // Spotify não retorna gênero diretamente
+    genre: ["metalcore", "djent", "metal", "mathcore", "post-hardcore", "deathcore"], 
+
+    
   }));
 }
