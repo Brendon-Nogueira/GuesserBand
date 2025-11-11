@@ -143,7 +143,6 @@ export const ARTIST_MAP: Record<string, string[]> = {
     "Papa Roach",
     "Disturbed",
     "Avenged Sevenfold",
-    "Bullet For My Valentine",
   ],
   pop: [
     "Madonna",

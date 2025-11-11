@@ -1,20 +1,16 @@
-// src/pages/Game/Game.tsx
 import React, { useEffect, useState } from "react";
 import { fetchAlbumsByGenre } from "../../api/Music";
 import type { Album } from "../../types/AlbumType/Album";
 import { fetchBadOmensAlbums } from "../../api/Artist";
 import AlbumCover from "../../components/AlbumCover/AlbumCover";
 import { motion, AnimatePresence } from "framer-motion";
-import { useTheme } from "../../context/ThemeContext/ThemeContext";
+import { LoaderCircleIcon, LucideTrophy } from "lucide-react";
 
 interface GameProps {
   thematic?: boolean;
 }
 
 const maxAttempts = 5;
-
-// local storage key
-const LOCAL_GUESSES_KEY = "gtb_previous_guesses";
 
 const Game: React.FC<GameProps> = ({ thematic }) => {
   const [attemptsLeft, setAttemptsLeft] = useState(maxAttempts);
@@ -26,26 +22,10 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
   const [score, setScore] = useState(0);
   const [hint, setHint] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("rock");
-  const [previousGuesses, setPreviousGuesses] = useState<string[]>([]);
-  const [guessesOpen, setGuessesOpen] = useState(false);
-  const [usedArtists, setUsedArtists] = useState<string[]>([]);
-
-  const { theme, toggleTheme } = useTheme();
-
-  // carrega  previous guesses do localStorage (se houver)
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LOCAL_GUESSES_KEY);
-      if (raw) setPreviousGuesses(JSON.parse(raw));
-    } catch (e) {}
-  }, []);
-
-  // atualiza o local storage
-  useEffect(() => {
-    try {
-      localStorage.setItem(LOCAL_GUESSES_KEY, JSON.stringify(previousGuesses));
-    } catch (e) {}
-  }, [previousGuesses]);
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [guesses, setGuesses] = useState<{ text: string; correct: boolean }[]>(
+    []
+  );
 
   // carrega novo album
   const loadAlbum = async (genre = selectedGenre) => {
@@ -64,7 +44,6 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
 
       const randomAlbum = albums[Math.floor(Math.random() * albums.length)];
       setAlbum(randomAlbum);
-      setUsedArtists((prev) => [...prev, randomAlbum.artist]);
     } catch (err) {
       console.error("Erro ao carregar álbuns:", err);
     } finally {
@@ -73,65 +52,49 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
       setFeedback(null);
       setGuess("");
       setHint("");
-
-      // não limpamos previousGuesses aqui — preservamos histórico por padrão
+      setGuesses([]);
       setLoading(false);
     }
   };
 
   useEffect(() => {
     loadAlbum();
-  }, [selectedGenre, thematic]);
+  }, [selectedGenre]);
 
-  const addGuessToHistory = (g: string) => {
-    setPreviousGuesses((prev) => {
-      const next = [...prev, g].slice(-50);
-      return next;
-    });
-  };
+  const toggleTheme = () =>
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
 
+  // Função de tentativa
   const handleGuess = () => {
-    if (!album) return;
-    const currentGuess = guess.trim();
-    if (currentGuess === "") return;
+    if (!album || !guess.trim()) return;
 
-    // adiciona ao histórico imediatamente (para feedback visual)
-    addGuessToHistory(currentGuess);
+    const correct =
+      guess.trim().toLowerCase() === album.artist.toLowerCase() ||
+      guess.trim().toLowerCase() === album.albumTitle.toLowerCase();
 
-    const normalized = currentGuess.toLowerCase();
-    const artistNorm = album.artist.toLowerCase();
-    const titleNorm = album.albumTitle.toLowerCase();
-    const correct = normalized === artistNorm || normalized === titleNorm;
+    setGuesses((prev) => [...prev, { text: guess.trim(), correct }]);
+    setGuess("");
 
     if (correct) {
       setFeedback("success");
-      setScore((s) => s + 1);
+      setScore((prev) => prev + 1);
       setPixelLevel(1);
-
-      // limpar campo e seguir
-      setGuess("");
-      setTimeout(() => loadAlbum(), 1600);
     } else {
       const newAttempts = attemptsLeft - 1;
       setAttemptsLeft(newAttempts);
       setFeedback("error");
-      setGuess("");
 
-      // reduz pixelização gradualmente
       if (newAttempts > 0) {
-        setPixelLevel((prev) =>
-          Math.max(1, prev - Math.ceil(20 / maxAttempts))
-        );
+        setPixelLevel((prev) => Math.max(1, prev - 4));
       }
 
       if (newAttempts === 3) {
         setHint(`💡 Dica: Ano do álbum é ${album.releaseYear}`);
       } else if (newAttempts === 2) {
         setHint(`💡 Dica: A banda começa com "${album.artist[0]}"`);
-      }
-
-      if (newAttempts === 0) {
-        setTimeout(() => loadAlbum(), 2000);
+      } else if (newAttempts === 0) {
+        setFeedback("error");
+        setPixelLevel(1);
       }
     }
   };
@@ -156,37 +119,51 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
     ((maxAttempts - attemptsLeft + 1) / maxAttempts) * 100;
 
   return (
-    <div className="bg-background-light dark:bg-background-dark font-display min-h-screen flex flex-col text-text-light dark:text-text-dark transition-colors duration-300">
+    <div
+      className={`${
+        theme === "dark"
+          ? "bg-[#0f0f0f] text-white"
+          : "bg-[#f7f7f7] text-gray-900"
+      } font-display min-h-screen flex flex-col transition-colors duration-500`}
+    >
       {/* Header */}
-      <header className="flex items-center justify-between border-b border-border-light dark:border-border-dark px-4 sm:px-10 py-3">
-        <h1 className="font-bold text-lg text-primary dark:text-primaryLight">
+      <header
+        className={`flex items-center justify-between px-4 sm:px-10 py-3 border-b ${
+          theme === "dark" ? "border-gray-700" : "border-gray-300"
+        }`}
+      >
+        <h1 className="text-lg font-bold">
           <a href="/">GUESS THE BAND</a>
         </h1>
-
         <div className="flex items-center gap-3">
-          <p className="font-medium">{score} pts</p>
+          <p>Pontuação: {score}</p>
 
           {/* Toggle de tema */}
           <button
             onClick={toggleTheme}
-            className="px-3 py-1 rounded-full text-sm border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark hover:opacity-90 transition-colors"
-            aria-label="Alternar tema"
+            className={`px-3 py-1 rounded-full text-sm font-semibold ${
+              theme === "dark"
+                ? "bg-gray-800 text-white hover:bg-gray-700"
+                : "bg-gray-200 text-gray-900 hover:bg-gray-300"
+            }`}
           >
-            {theme === "dark" ? "☀️ Claro" : "🌙 Escuro"}
+            {theme === "dark" ? "🌞 Light" : "🌙 Dark"}
           </button>
         </div>
       </header>
 
       {/* Seletor de gênero */}
-      <div className="flex justify-center gap-3 mt-6 flex-wrap px-4">
+      <div className="flex justify-center gap-3 mt-6 flex-wrap">
         {["rock", "pop", "indie", "80s", "metalcore"].map((genre) => (
           <button
             key={genre}
             onClick={() => setSelectedGenre(genre)}
-            className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+            className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
               selectedGenre === genre
-                ? "bg-primary text-white shadow-md"
-                : "border border-border-light dark:border-border-dark text-subtext-light dark:text-subtext-dark hover:bg-card-light dark:hover:bg-card-dark"
+                ? "bg-blue-600 text-white"
+                : theme === "dark"
+                ? "border border-white/30 text-white/80 hover:bg-white/10"
+                : "border border-gray-400 text-gray-700 hover:bg-gray-200"
             }`}
           >
             {genre.toUpperCase()}
@@ -195,148 +172,205 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
       </div>
 
       {/* Main */}
-      <main className="flex flex-col items-center justify-center flex-1 w-full gap-6 py-8 px-4">
+      <main className="flex flex-col items-center justify-center flex-1 w-full gap-8 py-10 px-4">
         {loading ? (
-          <p className="text-subtext-light dark:text-subtext-dark">
-            Carregando álbum...
-          </p>
-        ) : album ? (
+          <motion.div
+            className="flex justify-center items-center w-full max-w-lg h-64"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, rotate: 360 }}
+            transition={{
+              opacity: { duration: 0.3 },
+              rotate: { repeat: Infinity, duration: 1.2, ease: "linear" },
+            }}
+          >
+            <LoaderCircleIcon
+              size={64}
+              className={`${
+                theme === "dark" ? "text-blue-400" : "text-blue-600"
+              }`}
+            />
+          </motion.div>
+        ) : (feedback === "success" ||
+            (feedback === "error" && attemptsLeft === 0)) &&
+          album ? (
+          // ======== (ACERTO OU ERRO) ========
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4 }}
+            className="flex flex-col items-center gap-6 w-full max-w-lg text-center"
+          >
+            <h2
+              className={`text-2xl font-bold ${
+                feedback === "success" ? "text-green-400" : "text-red-400"
+              }`}
+            >
+              {feedback === "success" ? "Você Acertou!" : "Você Errou!"}
+            </h2>
+
+            {/* Card do Álbum */}
+            <div
+              className={`rounded-2xl shadow-lg overflow-hidden w-full flex flex-col items-center ${
+                theme === "dark" ? "bg-[#121212]" : "bg-white"
+              }`}
+            >
+              <img
+                src={album.coverArtUrl}
+                alt={album.albumTitle}
+                className="w-full aspect-square object-cover rounded-t-2xl"
+              />
+              <div className="py-4">
+                <h3 className="text-xl font-semibold">{album.artist}</h3>
+                <p className="text-gray-400 italic">
+                  {album.albumTitle} ({album.releaseYear})
+                </p>
+              </div>
+            </div>
+
+            {/* Pontuação ou mensagem de erro */}
+            {feedback === "success" ? (
+              <div
+                className={`rounded-xl p-4 flex items-center justify-between w-full shadow-md ${
+                  theme === "dark" ? "bg-[#1b1b1b]" : "bg-gray-100"
+                }`}
+              >
+                <div>
+                  <p className="text-3xl font-bold text-blue-500">
+                    {Math.round((attemptsLeft / maxAttempts) * 100)}
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    Pontos, baseado em {maxAttempts - attemptsLeft + 1}{" "}
+                    tentativa
+                    {maxAttempts - attemptsLeft + 1 > 1 ? "s" : ""}
+                  </p>
+                </div>
+                <LucideTrophy className="text-blue-500" size={32} />
+              </div>
+            ) : (
+              <div
+                className={`rounded-xl p-4 w-full text-center shadow-md ${
+                  theme === "dark" ? "bg-[#1b1b1b]" : "bg-gray-100"
+                }`}
+              >
+                <p className="text-gray-300">
+                  O álbum era{" "}
+                  <span className="font-semibold">{album.artist}</span> –{" "}
+                  <span className="italic">{album.albumTitle}</span>
+                </p>
+              </div>
+            )}
+
+            {/* Buttons */}
+            <div className="flex gap-4 w-full justify-center">
+              <button
+                onClick={() => loadAlbum()}
+                className="bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg hover:scale-105 transition-transform"
+              >
+                Tentar Novamente
+              </button>
+              <button
+                onClick={() => loadAlbum()}
+                className={`font-semibold py-3 px-6 rounded-lg hover:scale-105 transition-transform ${
+                  feedback === "success"
+                    ? "bg-blue-600 text-white"
+                    : "bg-red-600 text-white"
+                }`}
+              >
+                Próximo Desafio
+              </button>
+            </div>
+          </motion.div>
+        ) : (
+          // ======== TELA NORMAL (JOGO) ========
           <>
             <AnimatePresence mode="wait">
-              <motion.div
-                key={album.mbid}
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.98 }}
-                transition={{ duration: 0.35 }}
-                className="w-full max-w-lg rounded-xl overflow-hidden"
-              >
-                <div className="bg-card-light dark:bg-card-dark rounded-xl shadow-lg p-5 flex justify-center items-center">
+              {album ? (
+                <motion.div
+                  key={album.mbid}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.4 }}
+                  className={`w-full max-w-lg rounded-xl shadow-lg overflow-hidden flex justify-center items-center ${
+                    theme === "dark" ? "bg-[#121212]" : "bg-white"
+                  }`}
+                >
                   <AlbumCover url={album.coverArtUrl} pixelLevel={pixelLevel} />
-                </div>
-              </motion.div>
+                </motion.div>
+              ) : (
+                <p>Nenhum álbum encontrado.</p>
+              )}
             </AnimatePresence>
 
             {/* Status */}
-            <div className="w-full max-w-lg flex flex-col items-center gap-3 mt-2">
-              <p className="font-medium text-subtext-light dark:text-subtext-dark">
-                {attemptsLeft} tentativas restantes
-              </p>
-
-              <div className="w-full rounded-full bg-gray-200 dark:bg-gray-700 h-2">
-                <div
-                  className="h-2 rounded-full bg-primary transition-all duration-300"
-                  style={{ width: `${sharpnessPercentage}%` }}
-                />
-              </div>
-
-              {hint && (
-                <p className="text-yellow-700 dark:text-yellow-400 text-sm mt-1">
-                  {hint}
-                </p>
-              )}
-            </div>
-
-            {/* Input + botão */}
-            <div className="w-full max-w-lg flex flex-col sm:flex-row items-end gap-4 mt-3">
-              <input
-                type="text"
-                value={guess}
-                onChange={handleChange}
-                onKeyDown={handleKeyDown}
-                placeholder="Digite o nome da banda ou álbum..."
-                className="form-input w-full rounded-lg h-14 p-4 bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark placeholder:text-subtext-light dark:placeholder:text-subtext-dark border border-border-light dark:border-border-dark focus:outline-none focus:ring-2 focus:ring-primary"
-                disabled={attemptsLeft === 0 || feedback === "success"}
-              />
-
-              <button
-                onClick={handleGuess}
-                disabled={attemptsLeft === 0 || feedback === "success"}
-                className={`h-14 px-6 rounded-lg text-white font-bold transition-transform ${
-                  attemptsLeft === 0 || feedback === "success"
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-primary hover:bg-primaryLight active:scale-95"
-                }`}
-              >
-                Adivinhar
-              </button>
-            </div>
-
-            {/* Lista de palpites: toggle + conteúdo */}
-            <div className="w-full max-w-lg mt-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-subtext-light dark:text-subtext-dark">
-                  Tentativas anteriores
-                </h3>
-                <button
-                  onClick={() => setGuessesOpen((s) => !s)}
-                  className="text-sm px-2 py-1 rounded-md border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark"
-                >
-                  {guessesOpen ? "Fechar" : `Ver (${previousGuesses.length})`}
-                </button>
-              </div>
-
-              {guessesOpen && (
-                <div className="mt-2 bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark rounded-lg p-3">
-                  {previousGuesses.length === 0 ? (
-                    <p className="text-sm text-subtext-light dark:text-subtext-dark">
-                      Nenhuma tentativa ainda.
+            {!loading && album && (
+              <>
+                <div className="w-full max-w-lg flex flex-col items-center gap-2 mt-4">
+                  <p>{attemptsLeft} tentativas restantes</p>
+                  <div className="flex justify-between w-full max-w-lg gap-1 mt-1">
+                    {Array.from({ length: maxAttempts }).map((_, i) => (
+                      <div
+                        key={i}
+                        className={`flex-1 h-2 rounded-full transition-colors duration-300 ${
+                          i < maxAttempts - attemptsLeft
+                            ? "bg-blue-600"
+                            : theme === "dark"
+                            ? "bg-gray-700"
+                            : "bg-gray-300"
+                        }`}
+                      ></div>
+                    ))}
+                  </div>
+                  {hint && (
+                    <p className="text-yellow-400 text-center max-w-xs">
+                      {hint}
                     </p>
-                  ) : (
-                    <ul className="space-y-2 text-sm">
-                      {previousGuesses.map((g, i) => (
-                        <li
-                          key={i}
-                          className="flex items-center justify-between text-text-light dark:text-text-dark"
-                        >
-                          <span className="text-subtext-light dark:text-subtext-dark">
-                            {i + 1}. {g}
-                          </span>
-                          {/* opcional: botão para remover item */}
-                          <button
-                            onClick={() =>
-                              setPreviousGuesses((prev) =>
-                                prev.filter((_, idx) => idx !== i)
-                              )
-                            }
-                            className="text-xs px-2 py-0.5 rounded bg-transparent border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
-                            aria-label={`Remover tentativa ${i + 1}`}
-                          >
-                            Remover
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
                   )}
                 </div>
-              )}
-            </div>
 
-            {/* Feedback final */}
-            {feedback === "success" && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-green-700 dark:text-green-400 font-semibold mt-4"
-              >
-                ✅ Acertou! Era {album.artist} - {album.albumTitle}
-              </motion.p>
-            )}
+                {/* Input e Botão */}
+                <div className="w-full max-w-lg flex flex-col sm:flex-row items-end gap-2 mt-2">
+                  <input
+                    className={`form-input w-full rounded-lg h-14 p-[15px] focus:outline-none ${
+                      theme === "dark"
+                        ? "bg-gray-800 text-white"
+                        : "bg-gray-200 text-gray-900"
+                    }`}
+                    placeholder="Digite o nome da banda ou álbum..."
+                    value={guess}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    disabled={attemptsLeft === 0 || feedback === "success"}
+                  />
+                  <button
+                    onClick={handleGuess}
+                    disabled={attemptsLeft === 0 || feedback === "success"}
+                    className="h-14 px-6 bg-blue-600 text-white font-bold rounded-lg hover:scale-105 transition-transform"
+                  >
+                    Adivinhar
+                  </button>
+                </div>
 
-            {attemptsLeft === 0 && feedback === "error" && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-red-700 dark:text-red-400 font-semibold mt-4"
-              >
-                ❌ Fim de jogo! Era {album.artist} - {album.albumTitle}
-              </motion.p>
+                {/* Ultima tentativa */}
+                <div className="w-full max-w-lg mt-2 flex flex-col gap-2">
+                  {guesses.length > 0 && (
+                    <motion.div
+                      key={guesses.length - 1}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className={`rounded-lg px-4 py-2 text-center font-semibold transition-all duration-300 ${
+                        guesses[guesses.length - 1].correct
+                          ? "bg-green-500/30 text-green-400 border border-green-600"
+                          : "bg-red-500/30 text-red-400 border border-red-600"
+                      }`}
+                    >
+                      {guesses[guesses.length - 1].text}
+                    </motion.div>
+                  )}
+                </div>
+              </>
             )}
           </>
-        ) : (
-          <p className="text-subtext-light dark:text-subtext-dark">
-            Nenhum álbum encontrado para o gênero selecionado.
-          </p>
         )}
       </main>
     </div>

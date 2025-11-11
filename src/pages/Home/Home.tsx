@@ -1,14 +1,30 @@
 import { useNavigate } from "react-router-dom";
 import { ARTIST_MAP } from "../../api/Music";
 import { useTheme } from "../../context/ThemeContext/ThemeContext";
+import { useGame } from "../../context/GameContext/GameContext";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+  const { setGenre } = useGame();
 
   const handleSelectGenre = (genre: string) => {
-    localStorage.setItem("selectedGenre", genre.toLowerCase());
+    const lowerGenre = genre.toLowerCase();
+    setGenre(lowerGenre);
+    localStorage.setItem("selectedGenre", lowerGenre);
     navigate("/guess-the-band/game");
+  };
+
+  const handlePlayNow = () => {
+    setGenre("rock");
+    localStorage.setItem("selectedGenre", "rock");
+    navigate("/guess-the-band/game");
+  };
+
+  const handlePlayThematic = () => {
+    setGenre("rock");
+    localStorage.setItem("selectedGenre", "rock");
+    navigate("/guess-the-band/modo-tematico");
   };
 
   return (
@@ -75,14 +91,14 @@ const Home: React.FC = () => {
             <div className="flex flex-col sm:flex-row px-4 py-3 justify-center gap-4">
               <button
                 className="flex items-center justify-center w-full sm:w-auto h-12 px-8 bg-primary hover:bg-primaryLight text-white font-bold rounded-lg transition-transform hover:scale-105"
-                onClick={() => navigate("/guess-the-band/game")}
+                onClick={handlePlayNow}
               >
                 Jogar Agora
               </button>
 
               <button
                 className="flex items-center justify-center w-full sm:w-auto h-12 px-8 border border-primary text-primary dark:text-white font-bold rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors"
-                onClick={() => navigate("/guess-the-band/modo-tematico")}
+                onClick={handlePlayThematic}
               >
                 Modo Temático
               </button>
