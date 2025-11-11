@@ -1,17 +1,31 @@
 import { useNavigate } from "react-router-dom";
 import { ARTIST_MAP } from "../../api/Music";
+import { useTheme } from "../../context/ThemeContext/ThemeContext";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   const handleSelectGenre = (genre: string) => {
-    // salva o gênero no localStorage
     localStorage.setItem("selectedGenre", genre.toLowerCase());
     navigate("/guess-the-band/game");
   };
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-hidden font-display">
+    <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-hidden font-display transition-colors duration-500">
+      {/* Botão de troca de tema */}
+      <button
+        onClick={toggleTheme}
+        className="absolute top-4 right-4 z-50 flex items-center gap-2 px-4 py-2 rounded-full bg-card-dark dark:bg-card-light text-text-dark dark:text-text-light border border-border-dark dark:border-border-light hover:scale-105 transition-all"
+      >
+        <span className="material-symbols-outlined text-xl">
+          {theme === "dark" ? "light_mode" : "dark_mode"}
+        </span>
+        <span className="text-sm font-medium hidden sm:inline">
+          {theme === "dark" ? "Modo Claro" : "Modo Escuro"}
+        </span>
+      </button>
+
       {/* Background SVG */}
       <div className="absolute inset-0 z-0 opacity-10">
         <svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
@@ -50,24 +64,24 @@ const Home: React.FC = () => {
               </span>
             </div>
 
-            <h1 className="text-white text-4xl md:text-5xl font-bold leading-tight tracking-tight px-4 pb-3 pt-6">
+            <h1 className="text-text-light dark:text-text-dark text-4xl md:text-5xl font-bold leading-tight tracking-tight px-4 pb-3 pt-6">
               Guess The Band
             </h1>
-            <p className="text-white text-base font-normal leading-normal pb-6 pt-1 px-4 max-w-md mx-auto">
+            <p className="text-subtext-light dark:text-subtext-dark text-base font-normal leading-normal pb-6 pt-1 px-4 max-w-md mx-auto">
               Adivinhe a banda. Teste seus conhecimentos musicais e suba no
               ranking.
             </p>
 
             <div className="flex flex-col sm:flex-row px-4 py-3 justify-center gap-4">
               <button
-                className="flex items-center justify-center w-full sm:w-auto h-12 px-8 bg-primary text-white font-bold rounded-lg transition-transform hover:scale-105"
+                className="flex items-center justify-center w-full sm:w-auto h-12 px-8 bg-primary hover:bg-primaryLight text-white font-bold rounded-lg transition-transform hover:scale-105"
                 onClick={() => navigate("/guess-the-band/game")}
               >
                 Jogar Agora
               </button>
 
               <button
-                className="flex items-center justify-center w-full sm:w-auto h-12 px-8 border border-primary text-white font-bold rounded-lg hover:bg-primary/20 transition-colors"
+                className="flex items-center justify-center w-full sm:w-auto h-12 px-8 border border-primary text-primary dark:text-white font-bold rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors"
                 onClick={() => navigate("/guess-the-band/modo-tematico")}
               >
                 Modo Temático
@@ -75,7 +89,7 @@ const Home: React.FC = () => {
             </div>
 
             <div className="mt-4 px-4">
-              <p className="text-white/80 text-sm mb-3">
+              <p className="text-subtext-light dark:text-subtext-dark text-sm mb-3">
                 Escolha uma categoria:
               </p>
               <div className="flex flex-wrap justify-center gap-3">
@@ -83,7 +97,7 @@ const Home: React.FC = () => {
                   <button
                     key={genre}
                     onClick={() => handleSelectGenre(genre)}
-                    className="px-4 py-2 rounded-full border border-white/30 text-white/80 text-sm hover:bg-white/10 hover:border-white/50 transition-colors"
+                    className="px-4 py-2 rounded-full border border-border-light dark:border-border-dark text-subtext-light dark:text-subtext-dark text-sm hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
                   >
                     {genre.toUpperCase()}
                   </button>
@@ -93,7 +107,7 @@ const Home: React.FC = () => {
 
             <a
               href="#"
-              className="text-[#909acb] text-sm underline hover:text-white transition-colors pb-3 pt-6 px-4 text-center"
+              className="text-primaryLight dark:text-[#909acb] text-sm underline hover:text-primary transition-colors pb-3 pt-6 px-4 text-center"
             >
               Como Jogar
             </a>
@@ -103,13 +117,13 @@ const Home: React.FC = () => {
         <footer className="flex flex-col gap-6 px-5 py-10 text-center">
           <div className="flex flex-wrap items-center justify-center gap-6">
             <a
-              className="text-[#909acb] text-sm hover:text-white transition-colors"
+              className="text-subtext-light dark:text-[#909acb] text-sm hover:text-primary transition-colors"
               href="#"
             >
               Privacy Policy
             </a>
             <a
-              className="text-[#909acb] text-sm hover:text-white transition-colors"
+              className="text-subtext-light dark:text-[#909acb] text-sm hover:text-primary transition-colors"
               href="#"
             >
               Terms of Service
@@ -121,7 +135,7 @@ const Home: React.FC = () => {
               <a
                 key={social}
                 href="#"
-                className="text-[#909acb] hover:text-white transition-colors"
+                className="text-subtext-light dark:text-[#909acb] hover:text-primary transition-colors"
               >
                 <span className="sr-only">{social}</span>
                 <i className="material-symbols-outlined">share</i>
@@ -129,7 +143,7 @@ const Home: React.FC = () => {
             ))}
           </div>
 
-          <p className="text-[#909acb] text-sm">
+          <p className="text-subtext-light dark:text-[#909acb] text-sm">
             © 2025 Guess The Band. All rights reserved.
           </p>
         </footer>

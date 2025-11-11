@@ -1,7 +1,6 @@
-
 /* 1. TODOS OS @import URL primeiro */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined");
 
 /* 2. DIRETIVAS DO TAILWIND */
 @tailwind base;
@@ -10,7 +9,31 @@
 
 /* 3. COMENTÁRIOS E REGRAS PERSONALIZADAS */
 .material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
   font-size: inherit;
   line-height: 1;
+}
+
+/* 4. utilitarios */
+@layer utilities {
+  /* Fundo e texto principal */
+  .theme-bg {
+    @apply bg-light-background dark:bg-dark-background transition-colors duration-500;
+  }
+  .theme-text {
+    @apply text-light-text dark:text-dark-text transition-colors duration-500;
+  }
+  /* Cartões e áreas elevadas */
+  .theme-card {
+    @apply bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border transition-colors duration-500;
+  }
+  /* Texto secundário */
+  .theme-subtext {
+    @apply text-light-subtext dark:text-dark-subtext transition-colors duration-500;
+  }
+  /* Botões padrão */
+  .theme-btn {
+    @apply px-6 py-3 rounded-lg font-semibold text-white bg-primary hover:bg-primary-light dark:bg-primary-dark dark:hover:bg-primary;
+    @apply transition-colors duration-300;
+  }
 }
