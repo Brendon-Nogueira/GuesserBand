@@ -1,6 +1,8 @@
 import type { Album } from "../types/AlbumType/Album";
 
-const BACKEND_URL = "http://localhost:3001";
+// const BACKEND_URL = "http://localhost:3001";
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const ARTIST_MAP: Record<string, string[]> = {
   rock: [

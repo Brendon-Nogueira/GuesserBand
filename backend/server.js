@@ -12,7 +12,9 @@ app.get("/spotify-token", async (req, res) => {
     const clientId = process.env.SPOTIFY_CLIENT_ID;
     const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
-    const authString = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
+    const authString = Buffer.from(`${clientId}:${clientSecret}`).toString(
+      "base64"
+    );
 
     const response = await fetch("https://accounts.spotify.com/api/token", {
       method: "POST",
@@ -30,5 +32,7 @@ app.get("/spotify-token", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+module.exports = app;
+
+// const PORT = process.env.PORT || 3001;
+// app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
