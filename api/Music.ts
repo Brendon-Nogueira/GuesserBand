@@ -402,7 +402,8 @@ export const ARTIST_MAP: Record<string, string[]> = {
 };
 
 async function getSpotifyToken(): Promise<string> {
-  const response = await fetch(`${BACKEND_URL}/api/spotify-token`);
+  //const response = await fetch(`${BACKEND_URL}/api/spotify-token`);
+  const response = await fetch(`/api/spotify-token`);
 
   if (!response.ok) {
     const errorData = await response.json();

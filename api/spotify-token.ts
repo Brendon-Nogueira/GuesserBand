@@ -1,6 +1,13 @@
+import { VercelRequest, VercelResponse } from "@vercel/node";
 import axios from "axios";
 
-export default async (req, res) => {
+interface SpotifyTokenResponse {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+}
+
+export default async (req: VercelRequest, res: VercelResponse) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Content-Type", "application/json");
@@ -20,11 +27,11 @@ export default async (req, res) => {
       });
     }
 
-    const authString = Buffer.from(`${clientId}:${clientSecret}`).toString(
-      "base64"
-    );
+    const authString: string = Buffer.from(
+      `${clientId}:${clientSecret}`
+    ).toString("base64");
 
-    const response = await axios.post(
+    const response = await axios.post<SpotifyTokenResponse>(
       "https://accounts.spotify.com/api/token",
       "grant_type=client_credentials",
       {
@@ -37,10 +44,19 @@ export default async (req, res) => {
 
     const data = response.data;
 
+    console.log("Token obtido com sucesso:", data.access_token);
+
     res.status(200).json({ access_token: data.access_token });
   } catch (error) {
-    const statusCode = error.response ? error.response.status : 500;
-    const details = error.response ? error.response.data : error.message;
+    const axiosError = error as {
+      response?: { status: number; data: any };
+      message: string;
+    };
+
+    const statusCode = axiosError.response ? axiosError.response.status : 500;
+    const details = axiosError.response
+      ? axiosError.response.data
+      : axiosError.message;
 
     res.status(statusCode).json({
       error: "Erro ao obter token",
