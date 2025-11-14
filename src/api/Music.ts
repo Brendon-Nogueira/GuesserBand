@@ -1,9 +1,6 @@
 import type { Album } from "../types/AlbumType/Album";
 
-// const BACKEND_URL = "http://localhost:3001";
-
-const BACKEND_URL =
-  import.meta.env.MODE === "production" ? "/api" : "http://localhost:3001";
+const BACKEND_URL = "http://localhost:3001";
 
 export const ARTIST_MAP: Record<string, string[]> = {
   rock: [
