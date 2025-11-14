@@ -1,6 +1,6 @@
 import type { Album } from "../types/AlbumType/Album";
 
-const BACKEND_URL = "http://localhost:3001";
+const BACKEND_URL = "";
 
 export const ARTIST_MAP: Record<string, string[]> = {
   rock: [
@@ -401,9 +401,15 @@ export const ARTIST_MAP: Record<string, string[]> = {
   ],
 };
 
-// Função para pegar token do backend
 async function getSpotifyToken(): Promise<string> {
-  const response = await fetch(`${BACKEND_URL}/spotify-token`);
+  const response = await fetch(`${BACKEND_URL}/api/spotify-token`);
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error("Erro ao obter token da API:", errorData);
+    throw new Error(`Falha ao buscar token: ${response.statusText}`);
+  }
+
   const data = await response.json();
   return data.access_token;
 }
@@ -428,8 +434,17 @@ export async function fetchAlbumsByGenre(
   } while (randomArtist === lastArtist && artists.length > 1);
 
   const offset = Math.floor(Math.random() * 20);
+  // const response = await fetch(
+  //   `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+  //     randomArtist
+  //   )}&type=album&limit=50&offset=${offset}`,
+  //   {
+  //     headers: { Authorization: `Bearer ${token}` },
+  //   }
+  // );
+
   const response = await fetch(
-    `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+    `https://api.spotify.com/v1/search?q=$$${encodeURIComponent(
       randomArtist
     )}&type=album&limit=50&offset=${offset}`,
     {
