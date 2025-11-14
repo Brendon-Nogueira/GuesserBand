@@ -1,4 +1,4 @@
-import type { Album } from "../types/AlbumType/Album";
+import type { Album } from "../src/types/AlbumType/Album";
 
 const BACKEND_URL = "";
 

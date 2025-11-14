@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ARTIST_MAP } from "../../api/Music";
+import { ARTIST_MAP } from "../../../api/Music";
 import { useTheme } from "../../context/ThemeContext/ThemeContext";
 import { useGame } from "../../context/GameContext/GameContext";
 
