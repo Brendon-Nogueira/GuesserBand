@@ -115,8 +115,8 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
     }
   };
 
-  const sharpnessPercentage =
-    ((maxAttempts - attemptsLeft + 1) / maxAttempts) * 100;
+  // const sharpnessPercentage =
+  //   ((maxAttempts - attemptsLeft + 1) / maxAttempts) * 100;
 
   return (
     <div
