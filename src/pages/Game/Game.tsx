@@ -298,7 +298,13 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
                   <AlbumCover url={album.coverArtUrl} pixelLevel={pixelLevel} />
                 </motion.div>
               ) : (
-                <p>Nenhum álbum encontrado.</p>
+                // <p>Nenhum álbum encontrado.</p>
+                <button
+                  onClick={() => loadAlbum()}
+                  className="bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg hover:scale-105 transition-transform"
+                >
+                  Reiniciar
+                </button>
               )}
             </AnimatePresence>
 
