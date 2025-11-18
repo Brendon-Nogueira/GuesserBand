@@ -1,4 +1,4 @@
-import type { Album } from "../src/types/AlbumType/Album";
+import type { Album } from "../types/AlbumType/Album";
 
 const BACKEND_URL =
   import.meta.env.MODE === "production" ? "" : "http://localhost:3001";
@@ -396,7 +396,20 @@ export const ARTIST_MAP: Record<string, string[]> = {
 };
 
 async function getSpotifyToken(): Promise<string> {
-  const response = await fetch(`${BACKEND_URL}/api/spotify-token`);
+  let apiUrl: string;
+
+  // chamada vercel
+  if (import.meta.env.MODE === "production") {
+    apiUrl = "/api/spotify-token";
+  } else {
+    // chamada local
+    apiUrl = `${BACKEND_URL}/spotify-token`;
+  }
+
+  console.log("Buscando token Spotify em:", apiUrl);
+
+  const response = await fetch(apiUrl);
+  // const response = await fetch(`${BACKEND_URL}/api/spotify-token`);
   //const response = await fetch(`/api/spotify-token`);
 
   if (!response.ok) {
@@ -429,14 +442,6 @@ export async function fetchAlbumsByGenre(
   } while (randomArtist === lastArtist && artists.length > 1);
 
   const offset = Math.floor(Math.random() * 20);
-  // const response = await fetch(
-  //   `https://api.spotify.com/v1/search?q=${encodeURIComponent(
-  //     randomArtist
-  //   )}&type=album&limit=50&offset=${offset}`,
-  //   {
-  //     headers: { Authorization: `Bearer ${token}` },
-  //   }
-  // );
 
   const response = await fetch(
     `https://api.spotify.com/v1/search?q=$$${encodeURIComponent(

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { fetchAlbumsByGenre } from "../../../api/Music";
+import { fetchAlbumsByGenre } from "../../Utils/Music";
 import type { Album } from "../../types/AlbumType/Album";
-import { fetchBadOmensAlbums } from "../../../api/Artist";
+import { fetchBadOmensAlbums } from "../../Utils/Artist";
 import AlbumCover from "../../components/AlbumCover/AlbumCover";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoaderCircleIcon, LucideTrophy } from "lucide-react";
