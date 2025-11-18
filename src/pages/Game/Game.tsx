@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { fetchAlbumsByGenre } from "../../Utils/Music";
+import React, { useEffect, useState, useMemo } from "react";
+import { fetchAlbumsByGenre, ARTIST_MAP } from "../../Utils/Music";
 import type { Album } from "../../types/AlbumType/Album";
 import { fetchBadOmensAlbums } from "../../Utils/Artist";
 import AlbumCover from "../../components/AlbumCover/AlbumCover";
@@ -26,6 +26,7 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
   const [guesses, setGuesses] = useState<{ text: string; correct: boolean }[]>(
     []
   );
+  const [suggestions, setSuggestions] = useState<string[]>([]);
 
   // carrega novo album
   const loadAlbum = async (genre = selectedGenre) => {
@@ -99,11 +100,46 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setGuess(e.target.value);
-    setFeedback(null);
-  };
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setGuess(e.target.value);
+  //   setFeedback(null);
+  // };
 
+  // função de Autocomplete
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputGuess = e.target.value;
+    setGuess(inputGuess);
+    setFeedback(null);
+
+    if (inputGuess.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+
+    const inputLower = inputGuess.toLowerCase();
+
+    const allArtists = Object.values(ARTIST_MAP).flat();
+
+    const uniqueSuggestions = allArtists.reduce(
+      (accumulator: string[], currentValue: string) => {
+        if (!accumulator.includes(currentValue)) {
+          accumulator.push(currentValue);
+        }
+        return accumulator;
+      },
+      []
+    );
+
+    const filteredSuggestions = uniqueSuggestions
+      .filter((artist) => artist.toLowerCase().includes(inputLower))
+      .sort((a, b) => a.localeCompare(b))
+      .slice(0, 10);
+
+    console.log(uniqueSuggestions);
+    console.log(filteredSuggestions);
+
+    setSuggestions(filteredSuggestions);
+  };
   // permite enviar com Enter
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -336,22 +372,52 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
 
                 {/* Input e Botão */}
                 <div className="w-full max-w-lg flex flex-col sm:flex-row items-end gap-2 mt-2">
-                  <input
-                    className={`form-input w-full rounded-lg h-14 p-[15px] focus:outline-none ${
-                      theme === "dark"
-                        ? "bg-gray-800 text-white"
-                        : "bg-gray-200 text-gray-900"
-                    }`}
-                    placeholder="Digite o nome da banda ou álbum..."
-                    value={guess}
-                    onChange={handleChange}
-                    onKeyDown={handleKeyDown}
-                    disabled={attemptsLeft === 0 || feedback === "success"}
-                  />
+                  <div className="relative w-full">
+                    <input
+                      className={`form-input w-full rounded-lg h-14 p-[15px] focus:outline-none ${
+                        theme === "dark"
+                          ? "bg-gray-800 text-white"
+                          : "bg-gray-200 text-gray-900"
+                      }`}
+                      placeholder="Digite o nome da banda ou álbum..."
+                      value={guess}
+                      onChange={handleInputChange}
+                      onKeyDown={handleKeyDown}
+                      disabled={attemptsLeft === 0 || feedback === "success"}
+                    />
+
+                    {/* LISTA DE SUGESTÕES (Autocomplete) */}
+                    {suggestions.length > 0 && (
+                      <ul
+                        className={`absolute z-20 w-full mt-1 rounded-lg shadow-xl max-h-48 overflow-y-auto ${
+                          theme === "dark"
+                            ? "bg-gray-700 border border-gray-600"
+                            : "bg-white border border-gray-300"
+                        }`}
+                      >
+                        {suggestions.map((artist, index) => (
+                          <li
+                            key={index}
+                            className={`p-3 cursor-pointer hover:${
+                              theme === "dark" ? "bg-gray-600" : "bg-gray-100"
+                            }`}
+                            onClick={() => {
+                              setGuess(artist);
+                              setSuggestions([]);
+                            }}
+                          >
+                            {artist}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  {/* Botão de Adivinhar (MANTIDO FORA do contêiner relativo) */}
                   <button
                     onClick={handleGuess}
                     disabled={attemptsLeft === 0 || feedback === "success"}
-                    className="h-14 px-6 bg-blue-600 text-white font-bold rounded-lg hover:scale-105 transition-transform"
+                    className="h-14 px-6 bg-blue-600 text-white font-bold rounded-lg hover:scale-105 transition-transform whitespace-nowrap"
                   >
                     Adivinhar
                   </button>
