@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { fetchAlbumsByGenre, ARTIST_MAP } from "../../Utils/Music";
 import type { Album } from "../../types/AlbumType/Album";
 import { fetchBadOmensAlbums } from "../../Utils/Artist";
@@ -100,11 +100,6 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
     }
   };
 
-  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setGuess(e.target.value);
-  //   setFeedback(null);
-  // };
-
   // função de Autocomplete
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputGuess = e.target.value;
@@ -140,12 +135,11 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
 
     setSuggestions(filteredSuggestions);
   };
-  // permite enviar com Enter
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
 
-      // se botão está desabilitado por tentativas, não faz nada
       if (attemptsLeft === 0 || feedback === "success") return;
       handleGuess();
     }
