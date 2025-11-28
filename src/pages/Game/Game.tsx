@@ -27,6 +27,7 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
     []
   );
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [pointsGainedInRound, setPointsGainedInRound] = useState(0);
 
   // carrega novo album
   const loadAlbum = async (genre = selectedGenre) => {
@@ -65,21 +66,40 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
   const toggleTheme = () =>
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
 
+  const POINTS_PER_ATTEMPT = 20;
+  const BONUS_ALBUM_TITLE = 100;
+
   // Função de tentativa
   const handleGuess = () => {
     if (!album || !guess.trim()) return;
 
-    const correct =
-      guess.trim().toLowerCase() === album.artist.toLowerCase() ||
-      guess.trim().toLowerCase() === album.albumTitle.toLowerCase();
+    const guessLower = guess.trim().toLowerCase();
+    const artistMatch = guessLower === album.artist.toLowerCase();
+    const albumMatch = guessLower === album.albumTitle.toLowerCase();
+
+    const correct = artistMatch || albumMatch;
 
     setGuesses((prev) => [...prev, { text: guess.trim(), correct }]);
     setGuess("");
 
     if (correct) {
       setFeedback("success");
-      setScore((prev) => prev + 1);
       setPixelLevel(1);
+
+      // 1. Calcula pontos por tentativas restantes
+      let pointsAwarded = (attemptsLeft + 1) * POINTS_PER_ATTEMPT;
+
+      const isFirstAttempt = guesses.length === 0;
+
+      if (isFirstAttempt) {
+        if (albumMatch) {
+          pointsAwarded += BONUS_ALBUM_TITLE;
+        }
+      }
+
+      // Define a pontuação ganha para exibição
+      setPointsGainedInRound(pointsAwarded);
+      setScore((prev) => prev + pointsAwarded);
     } else {
       const newAttempts = attemptsLeft - 1;
       setAttemptsLeft(newAttempts);
@@ -144,9 +164,6 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
       handleGuess();
     }
   };
-
-  // const sharpnessPercentage =
-  //   ((maxAttempts - attemptsLeft + 1) / maxAttempts) * 100;
 
   return (
     <div
@@ -259,23 +276,28 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
 
             {/* Pontuação ou mensagem de erro */}
             {feedback === "success" ? (
-              <div
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
                 className={`rounded-xl p-4 flex items-center justify-between w-full shadow-md ${
                   theme === "dark" ? "bg-[#1b1b1b]" : "bg-gray-100"
                 }`}
               >
                 <div>
+                  {/* 🌟 NOVO: Exibe a pontuação real ganha nesta rodada */}
                   <p className="text-3xl font-bold text-blue-500">
-                    {Math.round((attemptsLeft / maxAttempts) * 100)}
+                    +{pointsGainedInRound}
                   </p>
                   <p className="text-sm text-gray-400">
-                    Pontos, baseado em {maxAttempts - attemptsLeft + 1}{" "}
-                    tentativa
-                    {maxAttempts - attemptsLeft + 1 > 1 ? "s" : ""}
+                    Pontos ganhos em {maxAttempts - attemptsLeft}
+                    {maxAttempts - attemptsLeft > 1
+                      ? " tentativas"
+                      : " tentativa"}
                   </p>
                 </div>
                 <LucideTrophy className="text-blue-500" size={32} />
-              </div>
+              </motion.div>
             ) : (
               <div
                 className={`rounded-xl p-4 w-full text-center shadow-md ${
@@ -407,7 +429,7 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
                     )}
                   </div>
 
-                  {/* Botão de Adivinhar (MANTIDO FORA do contêiner relativo) */}
+                  {/* Botão de Adivinhar */}
                   <button
                     onClick={handleGuess}
                     disabled={attemptsLeft === 0 || feedback === "success"}
