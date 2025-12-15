@@ -10,6 +10,8 @@ import Game from "./pages/Game/Game";
 import { ThemeProvider } from "./context/ThemeContext/ThemeContext";
 import { GameProvider } from "./context/GameContext/GameContext";
 
+import ThematicGame from "./pages/Game/ThematicGame";
+
 function App() {
   return (
     <ThemeProvider>
@@ -31,7 +33,7 @@ function App() {
             {/* Modo temático */}
             <Route
               path="/guess-the-band/modo-tematico"
-              element={<Game thematic />}
+              element={<ThematicGame />}
             />
 
             {/* Caso a rota não exista */}

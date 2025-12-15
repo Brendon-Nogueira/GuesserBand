@@ -22,6 +22,8 @@ export const ARTIST_MAP: Record<string, string[]> = {
     "Red Hot Chili Peppers",
     "Pearl Jam",
     "Soundgarden",
+    "Creed",
+    "Skid Row",
     "The Doors",
     "Deep Purple",
     "Black Sabbath",
@@ -46,11 +48,12 @@ export const ARTIST_MAP: Record<string, string[]> = {
     "Jimmy Page",
     "Kiss",
     "Lynyrd Skynyrd",
-    "Van Halen",
     "The Police",
     "Journey",
     "The Kinks",
     "Yes",
+    "R.E.M.",
+    "a-ha",
     "Iron Maiden",
     "Judas Priest",
     "Motörhead",
@@ -61,10 +64,16 @@ export const ARTIST_MAP: Record<string, string[]> = {
     "Black Flag",
     "Queensrÿche",
     "Megadeth",
+    "Greta Van Fleet",
+    "Anthrax",
+    "Ramones",
+    "Faith No More",
+    "Tool",
+    "Dream Theater",
+    "Van Halen",
     "Slayer",
     "Pantera",
     "Alice in Chains",
-    "Tool",
     "Rage Against the Machine",
     "System of a Down",
     "Muse",
@@ -435,36 +444,198 @@ export async function fetchAlbumsByGenre(
     return [];
   }
 
-  // Escolhe um artista aleatório diferente do anterior
-  let randomArtist: string;
-  do {
-    randomArtist = artists[Math.floor(Math.random() * artists.length)];
-  } while (randomArtist === lastArtist && artists.length > 1);
+  // Tenta buscar de até 5 artistas diferentes se não encontrar álbuns
+  const maxRetries = 5;
 
-  const offset = Math.floor(Math.random() * 20);
+  for (let i = 0; i < maxRetries; i++) {
+    // Escolhe um artista aleatório diferente do anterior
+    let randomArtist: string;
+    let attempts = 0;
+    do {
+      randomArtist = artists[Math.floor(Math.random() * artists.length)];
+      attempts++;
+    } while (
+      randomArtist === lastArtist &&
+      artists.length > 1 &&
+      attempts < 10
+    );
 
-  const response = await fetch(
-    `https://api.spotify.com/v1/search?q=$$${encodeURIComponent(
-      randomArtist
-    )}&type=album&limit=50&offset=${offset}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
+    try {
+      // Removido o offset aleatório que causava resultados vazios
+      // Removido o typo '$$' da query e usado 'artist:' para busca mais precisa
+      const response = await fetch(
+        `https://api.spotify.com/v1/search?q=artist:${encodeURIComponent(
+          randomArtist
+        )}&type=album&limit=50`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (!response.ok) {
+        console.warn(
+          `Erro ao buscar álbuns de ${randomArtist}: ${response.status}`
+        );
+        continue;
+      }
+
+      const data = await response.json();
+
+      const retornoTratado: Album[] =
+        data.albums?.items
+          ?.filter((item: any) => item.album_type === "album")
+          // Filtra para garantir que o artista principal é o que buscamos (evita feats e coletâneas incorretas)
+          .filter(
+            (item: any) =>
+              item.artists[0]?.name
+                .toLowerCase()
+                .includes(randomArtist.toLowerCase()) ||
+              randomArtist
+                .toLowerCase()
+                .includes(item.artists[0]?.name.toLowerCase())
+          )
+          .map((item: any) => ({
+            mbid: item.id,
+            artist: item.artists[0]?.name ?? randomArtist,
+            albumTitle: item.name,
+            releaseYear: parseInt(item.release_date?.split("-")[0] ?? "0"),
+            coverArtUrl: item.images?.[0]?.url ?? "",
+            genre,
+          })) || [];
+
+      if (retornoTratado.length > 0) {
+        // console.log(
+        //   `Álbuns encontrados para ${randomArtist}: ${retornoTratado.length}`
+        // );
+        return retornoTratado;
+      }
+
+      // Se chegou aqui, não achou álbuns válidos para este artista, tenta o próximo do loop
+      // console.log(`Tentativa ${i+1}: Nenhum álbum válido encontrado para ${randomArtist}, tentando outro...`);
+    } catch (error) {
+      console.error(`Erro na tentativa ${i + 1} com ${randomArtist}:`, error);
     }
-  );
+  }
 
-  const data = await response.json();
-  const retornoTratado: Album[] = data.albums?.items
-    ?.filter((item: any) => item.album_type === "album")
-    .filter((item: any) => artists.includes(item.artists[0]?.name))
-    .map((item: any) => ({
-      mbid: item.id,
-      artist: item.artists[0]?.name ?? "Desconhecido",
-      albumTitle: item.name,
-      releaseYear: parseInt(item.release_date?.split("-")[0] ?? "0"),
-      coverArtUrl: item.images?.[0]?.url ?? "",
-      genre,
-    }));
+  console.error("Falha ao encontrar álbuns após várias tentativas.");
+  return [];
+}
 
-  //console.log(`Artista escolhido: ${randomArtist}`);
-  return retornoTratado;
+// Busca álbuns por década (Thematic Mode)
+export async function fetchAlbumsByDecade(
+  decade: string,
+  lastArtist: string | null = null
+): Promise<Album[]> {
+  const token = await getSpotifyToken();
+
+  // Mapeamento de décadas para anos
+  const decadeMap: Record<string, string> = {
+    "70s": "1970-1979",
+    "80s": "1980-1989",
+    "90s": "1990-1999",
+    "2000s": "2000-2009",
+    "2010s": "2010-2019",
+  };
+
+  const yearRange = decadeMap[decade] || "2020-2024";
+
+  // Lista de gêneros "seguros" para garantir que não venham coisas muito obscuras
+  const validGenres = ["rock", "pop", "metal", "indie", "alternative"];
+  const maxRetries = 5;
+
+  for (let i = 0; i < maxRetries; i++) {
+    const randomGenre =
+      validGenres[Math.floor(Math.random() * validGenres.length)];
+
+    // Configuração de tentativa progressiva:
+    // 0-1: Offset aleatório + gênero (busca variada)
+    // 2-3: Offset zero + gênero (busca segura no gênero)
+    // 4: Offset zero + sem gênero (fallback de segurança total - traz qualquer coisa da década)
+
+    let queryOffset = 0;
+    let queryGenreString = ` genre:${randomGenre}`;
+
+    if (i < 2) {
+      queryOffset = Math.floor(Math.random() * 50);
+    } else if (i < 4) {
+      queryOffset = 0;
+    } else {
+      // Última tentativa: busca global na década sem filtro de gênero
+      queryOffset = 0;
+      queryGenreString = "";
+    }
+
+    try {
+      const response = await fetch(
+        `https://api.spotify.com/v1/search?q=year:${yearRange}${queryGenreString}&type=album&limit=50&offset=${queryOffset}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (!response.ok) {
+        console.warn(
+          `Erro ao buscar álbuns da década ${decade} (Tentativa ${i + 1}): ${
+            response.status
+          }`
+        );
+        continue;
+      }
+
+      const data = await response.json();
+
+      const retornoTratado: Album[] =
+        data.albums?.items
+          ?.filter((item: any) => item.album_type === "album")
+          .map((item: any) => ({
+            mbid: item.id,
+            artist: item.artists[0]?.name ?? "Desconhecido",
+            albumTitle: item.name,
+            releaseYear: parseInt(item.release_date?.split("-")[0] ?? "0"),
+            coverArtUrl: item.images?.[0]?.url ?? "",
+          }))
+          // Remove o artista anterior se houver
+          .filter(
+            (album: Album) => !lastArtist || album.artist !== lastArtist
+          ) || [];
+
+      if (retornoTratado.length > 0) {
+        return retornoTratado;
+      }
+    } catch (error) {
+      console.error(
+        `Erro ao buscar álbuns da década ${decade} (Tentativa ${i + 1}):`,
+        error
+      );
+    }
+  }
+
+  console.error("Falha ao encontrar álbuns por década após várias tentativas.");
+  return [];
+}
+
+// Busca artistas para o autocomplete (Thematic Mode)
+export async function searchArtists(query: string): Promise<string[]> {
+  if (!query || query.length < 2) return [];
+
+  const token = await getSpotifyToken();
+
+  try {
+    const response = await fetch(
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+        query
+      )}&type=artist&limit=5`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (!response.ok) return [];
+
+    const data = await response.json();
+    return data.artists?.items?.map((artist: any) => artist.name) || [];
+  } catch (error) {
+    console.error("Erro ao buscar artistas:", error);
+    return [];
+  }
 }

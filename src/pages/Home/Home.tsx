@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { ARTIST_MAP } from "../../Utils/Music";
 import { useTheme } from "../../context/ThemeContext/ThemeContext";
 import { useGame } from "../../context/GameContext/GameContext";
+import { Twitter, Instagram, Facebook } from "lucide-react";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -147,16 +148,24 @@ const Home: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap justify-center gap-6">
-            {["Twitter", "Instagram", "Facebook"].map((social) => (
-              <a
-                key={social}
-                href="#"
-                className="text-subtext-light dark:text-[#909acb] hover:text-primary transition-colors"
-              >
-                <span className="sr-only">{social}</span>
-                <i className="material-symbols-outlined">share</i>
-              </a>
-            ))}
+            <a
+              href="#"
+              className="text-subtext-light dark:text-[#909acb] hover:text-primary transition-colors"
+            >
+              <Twitter size={24} />
+            </a>
+            <a
+              href="#"
+              className="text-subtext-light dark:text-[#909acb] hover:text-primary transition-colors"
+            >
+              <Instagram size={24} />
+            </a>
+            <a
+              href="#"
+              className="text-subtext-light dark:text-[#909acb] hover:text-primary transition-colors"
+            >
+              <Facebook size={24} />
+            </a>
           </div>
 
           <p className="text-subtext-light dark:text-[#909acb] text-sm">

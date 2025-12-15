@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { fetchAlbumsByGenre, ARTIST_MAP } from "../../Utils/Music";
 import type { Album } from "../../types/AlbumType/Album";
 import { fetchBadOmensAlbums } from "../../Utils/Artist";
+import { useGame } from "../../context/GameContext/GameContext";
 import AlbumCover from "../../components/AlbumCover/AlbumCover";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoaderCircleIcon, LucideTrophy } from "lucide-react";
@@ -21,7 +22,7 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
   const [loading, setLoading] = useState(true);
   const [score, setScore] = useState(0);
   const [hint, setHint] = useState("");
-  const [selectedGenre, setSelectedGenre] = useState("rock");
+  const { genre: selectedGenre, setGenre: setSelectedGenre } = useGame();
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [guesses, setGuesses] = useState<{ text: string; correct: boolean }[]>(
     []
@@ -35,7 +36,7 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
     try {
       const albums = thematic
         ? await fetchBadOmensAlbums()
-        : await fetchAlbumsByGenre(genre);
+        : await fetchAlbumsByGenre(genre, album?.artist);
 
       if (!albums || albums.length === 0) {
         console.warn("Nenhum álbum encontrado para o gênero:", genre);
@@ -75,7 +76,8 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
 
     const guessLower = guess.trim().toLowerCase();
     const artistMatch = guessLower === album.artist.toLowerCase();
-    const albumMatch = guessLower === album.albumTitle.toLowerCase();
+    const albumMatch =
+      guessLower === album.albumTitle.toLowerCase().split("(")[0].trim();
 
     const correct = artistMatch || albumMatch;
 
@@ -150,8 +152,8 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
       .sort((a, b) => a.localeCompare(b))
       .slice(0, 10);
 
-    console.log(uniqueSuggestions);
-    console.log(filteredSuggestions);
+    // console.log(uniqueSuggestions);
+    // console.log(filteredSuggestions);
 
     setSuggestions(filteredSuggestions);
   };
