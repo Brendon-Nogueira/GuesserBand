@@ -539,28 +539,40 @@ export async function fetchAlbumsByDecade(
 
   const yearRange = decadeMap[decade] || "2020-2024";
 
-  // Lista de gêneros "seguros" para garantir que não venham coisas muito obscuras
-  const validGenres = ["rock", "pop", "metal", "indie", "alternative"];
+  // Lista de gêneros
+  const validGenres = [
+    "rock",
+    "pop",
+    "metal",
+    "indie",
+    "alternative",
+    "metal core",
+  ];
   const maxRetries = 5;
 
   for (let i = 0; i < maxRetries; i++) {
     const randomGenre =
       validGenres[Math.floor(Math.random() * validGenres.length)];
 
-    // Configuração de tentativa progressiva:
-    // 0-1: Offset aleatório + gênero (busca variada)
-    // 2-3: Offset zero + gênero (busca segura no gênero)
-    // 4: Offset zero + sem gênero (fallback de segurança total - traz qualquer coisa da década)
+    // Configuração de tentativa progressiva com maior entropia:
+    // 0: Offset 0-500 + gênero (Alta variedade)
+    // 1: Offset 0-250 + gênero (Média variedade)
+    // 2: Offset 0-50 + gênero (Alta probabilidade)
+    // 3: Offset 0 + gênero (Segurança no gênero)
+    // 4: Offset 0 + sem gênero (Fallback total)
 
     let queryOffset = 0;
     let queryGenreString = ` genre:${randomGenre}`;
 
-    if (i < 2) {
+    if (i === 0) {
+      queryOffset = Math.floor(Math.random() * 500);
+    } else if (i === 1) {
+      queryOffset = Math.floor(Math.random() * 250);
+    } else if (i === 2) {
       queryOffset = Math.floor(Math.random() * 50);
-    } else if (i < 4) {
+    } else if (i === 3) {
       queryOffset = 0;
     } else {
-      // Última tentativa: busca global na década sem filtro de gênero
       queryOffset = 0;
       queryGenreString = "";
     }

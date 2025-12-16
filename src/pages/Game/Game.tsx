@@ -4,6 +4,8 @@ import type { Album } from "../../types/AlbumType/Album";
 import { fetchBadOmensAlbums } from "../../Utils/Artist";
 import { useGame } from "../../context/GameContext/GameContext";
 import AlbumCover from "../../components/AlbumCover/AlbumCover";
+import RankingBoard from "../../components/RankingBoard/RankingBoard";
+import { saveScore } from "../../Utils/RankingUtils";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoaderCircleIcon, LucideTrophy } from "lucide-react";
 
@@ -29,6 +31,7 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
   );
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [pointsGainedInRound, setPointsGainedInRound] = useState(0);
+  const [refreshRanking, setRefreshRanking] = useState(0);
 
   // carrega novo album
   const loadAlbum = async (genre = selectedGenre) => {
@@ -118,6 +121,14 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
       } else if (newAttempts === 0) {
         setFeedback("error");
         setPixelLevel(1);
+
+        // Salva pontuação ao perder todas as tentativas
+        if (score > 0) {
+          saveScore("standard", score);
+          setRefreshRanking((prev) => prev + 1);
+          // Opcional: Resetar score aqui ou manter até o usuário reiniciar
+          setScore(0);
+        }
       }
     }
   };
@@ -218,6 +229,11 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
             {genre.toUpperCase()}
           </button>
         ))}
+      </div>
+
+      {/* Ranking Section - Absolute Top Left */}
+      <div className="absolute top-20 left-4 z-20 hidden xl:block">
+        <RankingBoard mode="standard" refreshTrigger={refreshRanking} />
       </div>
 
       {/* Main */}

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { fetchAlbumsByDecade, searchArtists } from "../../Utils/Music";
 import type { Album } from "../../types/AlbumType/Album";
 import AlbumCover from "../../components/AlbumCover/AlbumCover";
+import RankingBoard from "../../components/RankingBoard/RankingBoard";
+import { saveScore } from "../../Utils/RankingUtils";
 import { motion, AnimatePresence } from "framer-motion";
 import { LucideTrophy, Clock } from "lucide-react";
 
@@ -17,9 +19,11 @@ const ThematicGame: React.FC = () => {
   const [pixelLevel, setPixelLevel] = useState(15);
   const [feedback, setFeedback] = useState<"success" | "error" | null>(null);
   const [album, setAlbum] = useState<Album | null>(null);
+  const [history, setHistory] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [score, setScore] = useState(0);
   const [pointsGainedInRound, setPointsGainedInRound] = useState(0);
+  const [refreshRanking, setRefreshRanking] = useState(0);
 
   const loadAlbum = async (decade = selectedDecade) => {
     setLoading(true);
@@ -27,14 +31,29 @@ const ThematicGame: React.FC = () => {
     try {
       const albums = await fetchAlbumsByDecade(decade, album?.artist);
 
-      if (!albums || albums.length === 0) {
-        setAlbum(null);
+      const availableAlbums = albums.filter(
+        (a) => !history.has(a.albumTitle + a.artist)
+      );
+
+      if (availableAlbums.length === 0) {
+        if (albums.length > 0) {
+          const fallbackAlbum =
+            albums[Math.floor(Math.random() * albums.length)];
+          setAlbum(fallbackAlbum);
+        } else {
+          setAlbum(null);
+        }
         setLoading(false);
         return;
       }
 
-      const randomAlbum = albums[Math.floor(Math.random() * albums.length)];
+      const randomAlbum =
+        availableAlbums[Math.floor(Math.random() * availableAlbums.length)];
       setAlbum(randomAlbum);
+
+      setHistory((prev) =>
+        new Set(prev).add(randomAlbum.albumTitle + randomAlbum.artist)
+      );
     } catch (err) {
       console.error("Erro ao carregar álbuns:", err);
     } finally {
@@ -42,6 +61,7 @@ const ThematicGame: React.FC = () => {
       setPixelLevel(20);
       setFeedback(null);
       setGuess("");
+      setPointsGainedInRound(0);
       setLoading(false);
     }
   };
@@ -89,6 +109,13 @@ const ThematicGame: React.FC = () => {
       setAttemptsLeft((prev) => prev - 1);
       setFeedback("error");
       setPixelLevel((prev) => Math.max(1, prev - 4));
+
+      // Game Over: Reset e Salvar Score
+      if (attemptsLeft - 1 === 0 && score > 0) {
+        saveScore("thematic", score);
+        setRefreshRanking((prev) => prev + 1);
+        setScore(0);
+      }
     }
     setGuess("");
   };
@@ -124,6 +151,11 @@ const ThematicGame: React.FC = () => {
           </p>
         </div>
       </header>
+
+      {/* Ranking Thematic Style - Absolute Top Left */}
+      <div className="absolute top-24 left-6 z-20 hidden xl:block">
+        <RankingBoard mode="thematic" refreshTrigger={refreshRanking} />
+      </div>
 
       <div className="flex justify-center gap-4 mt-6 flex-wrap relative z-10">
         {DECADES.map((decade) => (
@@ -178,10 +210,12 @@ const ThematicGame: React.FC = () => {
               />
             </div>
 
-            <div className="flex items-center gap-2 justify-center text-[#00ff9d] font-bold text-xl drop-shadow-[0_0_5px_rgba(0,255,157,0.5)]">
-              <LucideTrophy size={24} />
-              <span>+{pointsGainedInRound} pontos temporais</span>
-            </div>
+            {feedback === "success" && (
+              <div className="flex items-center gap-2 justify-center text-[#00ff9d] font-bold text-xl drop-shadow-[0_0_5px_rgba(0,255,157,0.5)]">
+                <LucideTrophy size={24} />
+                <span>+{pointsGainedInRound} pontos temporais</span>
+              </div>
+            )}
 
             <div className="text-center">
               <h3 className="text-2xl font-bold text-white">{album.artist}</h3>
