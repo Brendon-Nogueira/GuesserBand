@@ -4,7 +4,7 @@ import {
   type ScoreEntry,
   type GameMode,
 } from "../../Utils/RankingUtils";
-import { Trophy, Medal } from "lucide-react";
+import { Trophy } from "lucide-react";
 
 interface RankingBoardProps {
   mode: GameMode;
@@ -73,7 +73,7 @@ const RankingBoard: React.FC<RankingBoardProps> = ({
             <li
               key={index}
               className={`flex justify-between items-center py-3 px-2 rounded ${itemClass(
-                index
+                index,
               )}`}
             >
               <div className="flex items-center gap-3">
@@ -82,10 +82,10 @@ const RankingBoard: React.FC<RankingBoardProps> = ({
                     index === 0
                       ? "bg-yellow-400 text-white"
                       : index === 1
-                      ? "bg-gray-400 text-white"
-                      : index === 2
-                      ? "bg-orange-400 text-white"
-                      : "bg-gray-200 text-gray-600"
+                        ? "bg-gray-400 text-white"
+                        : index === 2
+                          ? "bg-orange-400 text-white"
+                          : "bg-gray-200 text-gray-600"
                   }`}
                 >
                   {index + 1}
