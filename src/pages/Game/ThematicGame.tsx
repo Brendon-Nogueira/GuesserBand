@@ -31,9 +31,7 @@ const ThematicGame: React.FC = () => {
     try {
       const albums = await fetchAlbumsByDecade(decade, album?.artist);
 
-      const availableAlbums = albums.filter(
-        (a) => !history.has(a.albumTitle + a.artist)
-      );
+      const availableAlbums = albums.filter((a) => !history.has(a.artist));
 
       if (availableAlbums.length === 0) {
         if (albums.length > 0) {
@@ -51,9 +49,7 @@ const ThematicGame: React.FC = () => {
         availableAlbums[Math.floor(Math.random() * availableAlbums.length)];
       setAlbum(randomAlbum);
 
-      setHistory((prev) =>
-        new Set(prev).add(randomAlbum.albumTitle + randomAlbum.artist)
-      );
+      setHistory((prev) => new Set(prev).add(randomAlbum.artist));
     } catch (err) {
       console.error("Erro ao carregar álbuns:", err);
     } finally {
@@ -74,7 +70,9 @@ const ThematicGame: React.FC = () => {
     const value = e.target.value;
     setGuess(value);
 
-    if (value.length > 1 && !feedback) {
+    // Permitir busca mesmo se feedback == "error" (para o usuário corrigir)
+    // Se feedback == "success", o input está disabled, então não chega aqui
+    if (value.length > 1) {
       const results = await searchArtists(value);
       setSuggestions(results.slice(0, 5));
     } else {
