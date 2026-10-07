@@ -1,39 +1,49 @@
-/* 1. TODOS OS @import URL primeiro */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined");
+/* Imports */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
 
-/* 2. DIRETIVAS DO TAILWIND */
+/* Diretivas Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* 3. COMENTÁRIOS E REGRAS PERSONALIZADAS */
-.material-symbols-outlined {
-  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-  font-size: inherit;
-  line-height: 1;
+/* Animações e Utilitários Customizados */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
 }
 
-/* 4. utilitarios */
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+.animate-spin-slow {
+  animation: spinSlow 12s linear infinite;
+}
+
 @layer utilities {
   /* Fundo e texto principal */
   .theme-bg {
-    @apply bg-light-background dark:bg-dark-background transition-colors duration-500;
+    @apply bg-background-light dark:bg-background-dark transition-colors duration-300;
   }
   .theme-text {
-    @apply text-light-text dark:text-dark-text transition-colors duration-500;
+    @apply text-text-light dark:text-text-dark transition-colors duration-300;
   }
   /* Cartões e áreas elevadas */
   .theme-card {
-    @apply bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border transition-colors duration-500;
+    @apply bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark transition-colors duration-300;
   }
   /* Texto secundário */
   .theme-subtext {
-    @apply text-light-subtext dark:text-dark-subtext transition-colors duration-500;
+    @apply text-subtext-light dark:text-subtext-dark transition-colors duration-300;
   }
   /* Botões padrão */
   .theme-btn {
-    @apply px-6 py-3 rounded-lg font-semibold text-white bg-primary hover:bg-primary-light dark:bg-primary-dark dark:hover:bg-primary;
-    @apply transition-colors duration-300;
+    @apply px-6 py-3 rounded-xl font-semibold text-white bg-primary hover:bg-primaryLight dark:bg-primaryDark dark:hover:bg-primary transition-all duration-300;
   }
 }

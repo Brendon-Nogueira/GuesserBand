@@ -1,178 +1,205 @@
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ARTIST_MAP } from "../../Utils/Music";
-import { useTheme } from "../../context/ThemeContext/ThemeContext";
 import { useGame } from "../../context/GameContext/GameContext";
-import { Twitter, Instagram, Facebook } from "lucide-react";
+import ThemeToggleButton from "../../components/ThemeToggleButton/ThemeToggleButton";
+import { Disc3, Sparkles, Clock, Flame, Music, ArrowRight, Grid3X3 } from "lucide-react";
+import { motion } from "framer-motion";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const { theme, toggleTheme } = useTheme();
   const { setGenre } = useGame();
 
   const handleSelectGenre = (genre: string) => {
     const lowerGenre = genre.toLowerCase();
     setGenre(lowerGenre);
     localStorage.setItem("selectedGenre", lowerGenre);
-    navigate("/guess-the-band/game");
+    navigate("/game");
   };
 
   const handlePlayNow = () => {
     setGenre("rock");
     localStorage.setItem("selectedGenre", "rock");
-    navigate("/guess-the-band/game");
+    navigate("/game");
+  };
+
+  const handlePlayMusicdle = () => {
+    navigate("/musicdle");
   };
 
   const handlePlayThematic = () => {
     setGenre("rock");
     localStorage.setItem("selectedGenre", "rock");
-    navigate("/guess-the-band/modo-tematico");
+    navigate("/modo-tematico");
   };
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-hidden font-display transition-colors duration-500">
-      {/* Botão de troca de tema */}
-      <button
-        onClick={toggleTheme}
-        className="absolute top-4 right-4 z-50 flex items-center gap-2 px-4 py-2 rounded-full bg-card-dark dark:bg-card-light text-text-dark dark:text-text-light border border-border-dark dark:border-border-light hover:scale-105 transition-all"
-      >
-        <span className="material-symbols-outlined text-xl">
-          {theme === "dark" ? "light_mode" : "dark_mode"}
-        </span>
-        <span className="text-sm font-medium hidden sm:inline">
-          {theme === "dark" ? "Modo Claro" : "Modo Escuro"}
-        </span>
-      </button>
-
-      {/* Background SVG */}
-      <div className="absolute inset-0 z-0 opacity-10">
-        <svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern
-              id="soundwave"
-              width="100"
-              height="100"
-              patternUnits="userSpaceOnUse"
-            >
-              <path
-                d="M0 50 Q 25 25, 50 50 T 100 50"
-                fill="none"
-                stroke="#909acb"
-                strokeWidth="1"
-              />
-              <path
-                d="M0 55 Q 25 80, 50 55 T 100 55"
-                fill="none"
-                stroke="#909acb"
-                strokeWidth="0.5"
-              />
-            </pattern>
-          </defs>
-          <rect fill="url(#soundwave)" width="100%" height="100%" />
-        </svg>
+    <div className="relative min-h-screen w-full flex flex-col bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark transition-colors duration-500 overflow-x-hidden font-display">
+      
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30 dark:opacity-20">
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/30 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-1/2 -right-40 w-96 h-96 bg-purple-600/25 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -bottom-20 left-1/3 w-96 h-96 bg-emerald-600/20 rounded-full blur-3xl" />
       </div>
 
       {/* Conteúdo */}
-      <div className="z-10 flex flex-col h-full">
-        <main className="flex flex-1 flex-col items-center justify-center px-4 py-5 text-center sm:px-6 md:px-8">
-          <div className="flex flex-col max-w-[960px] justify-center">
-            <div className="flex items-center justify-center gap-4 mb-4">
-              <span className="material-symbols-outlined text-primary text-5xl">
-                music_note
+      <header className="relative z-20 flex items-center justify-between px-6 sm:px-12 py-5 max-w-7xl w-full mx-auto">
+        <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/25">
+            <Disc3 size={22} className="animate-spin-slow" />
+          </div>
+          <span className="font-extrabold text-lg sm:text-xl tracking-tight bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600 bg-clip-text text-transparent">
+            GuesserBand
+          </span>
+        </div>
+
+        <ThemeToggleButton showLabel />
+      </header>
+
+      {/* Hero Section */}
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-6 max-w-6xl mx-auto w-full text-center">
+        {/* Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 mb-5"
+        >
+          <Sparkles size={14} />
+          <span>O Desafio Definitivo para Amantes de Música</span>
+        </motion.div>
+
+        {/* Título Principal */}
+        <motion.h1
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.1] max-w-3xl"
+        >
+          Adivinhe suas bandas favoritas em{" "}
+          <span className="bg-gradient-to-r from-blue-500 via-indigo-400 to-purple-500 bg-clip-text text-transparent">
+            múltiplos modos
+          </span>
+        </motion.h1>
+
+        {/* Subtítulo */}
+        <motion.p
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mt-3 text-sm sm:text-base text-subtext-light dark:text-subtext-dark max-w-xl mx-auto leading-relaxed"
+        >
+          Do clássico mistério das capas pixeladas ao novo modo estilo Loldle com atributos comparativos em tempo real.
+        </motion.p>
+
+        {/* Cards */}
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-8 w-full max-w-5xl"
+        >
+         
+          <div
+            onClick={handlePlayMusicdle}
+            className="group relative p-6 rounded-3xl text-left border cursor-pointer transition-all duration-300 hover:-translate-y-1.5 bg-gradient-to-b from-blue-500/10 via-white/80 to-white/40 dark:from-blue-600/20 dark:via-gray-900/90 dark:to-gray-900/60 backdrop-blur-md border-blue-500/40 hover:border-blue-500 shadow-xl hover:shadow-blue-500/25 ring-2 ring-blue-500/20"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-md shadow-blue-600/30">
+                <Grid3X3 size={24} />
+              </div>
+              <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-blue-600 text-white tracking-wide shadow-sm">
+                NOVO MODO
               </span>
             </div>
-
-            <h1 className="text-text-light dark:text-text-dark text-4xl md:text-5xl font-bold leading-tight tracking-tight px-4 pb-3 pt-6">
-              Guess The Band
-            </h1>
-            <p className="text-subtext-light dark:text-subtext-dark text-base font-normal leading-normal pb-6 pt-1 px-4 max-w-md mx-auto">
-              Adivinhe a banda. Teste seus conhecimentos musicais e suba no
-              ranking.
+            <h3 className="text-xl font-extrabold tracking-tight mb-1 text-gray-900 dark:text-white flex items-center gap-1.5">
+              Musicdle (Loldle)
+            </h3>
+            <p className="text-xs sm:text-sm text-subtext-light dark:text-subtext-dark mb-4">
+              Adivinhe a banda através de pistas de atributos: Gênero, País de Origem, Ano de Formação e Integrantes!
             </p>
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform">
+              Jogar Musicdle <ArrowRight size={14} />
+            </span>
+          </div>
 
-            <div className="flex flex-col sm:flex-row px-4 py-3 justify-center gap-4">
-              <button
-                className="flex items-center justify-center w-full sm:w-auto h-12 px-8 bg-primary hover:bg-primaryLight text-white font-bold rounded-lg transition-transform hover:scale-105"
-                onClick={handlePlayNow}
-              >
-                Jogar Agora
-              </button>
-
-              <button
-                className="flex items-center justify-center w-full sm:w-auto h-12 px-8 border border-primary text-primary dark:text-white font-bold rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors"
-                onClick={handlePlayThematic}
-              >
-                Modo Temático
-              </button>
-            </div>
-
-            <div className="mt-4 px-4">
-              <p className="text-subtext-light dark:text-subtext-dark text-sm mb-3">
-                Escolha uma categoria:
-              </p>
-              <div className="flex flex-wrap justify-center gap-3">
-                {Object.keys(ARTIST_MAP).map((genre) => (
-                  <button
-                    key={genre}
-                    onClick={() => handleSelectGenre(genre)}
-                    className="px-4 py-2 rounded-full border border-border-light dark:border-border-dark text-subtext-light dark:text-subtext-dark text-sm hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
-                  >
-                    {genre.toUpperCase()}
-                  </button>
-                ))}
+          
+          <div
+            onClick={handlePlayNow}
+            className="group relative p-6 rounded-3xl text-left border cursor-pointer transition-all duration-300 hover:-translate-y-1.5 bg-white/70 dark:bg-card-dark/80 backdrop-blur-md border-border-light dark:border-border-dark hover:border-indigo-500/50 shadow-lg hover:shadow-indigo-500/15"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Flame size={24} />
               </div>
+              <span className="flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform">
+                Jogar <ArrowRight size={14} />
+              </span>
             </div>
-
-            <a
-              href="#"
-              className="text-primaryLight dark:text-[#909acb] text-sm underline hover:text-primary transition-colors pb-3 pt-6 px-4 text-center"
-            >
-              Como Jogar
-            </a>
-          </div>
-        </main>
-
-        <footer className="flex flex-col gap-6 px-5 py-10 text-center">
-          <div className="flex flex-wrap items-center justify-center gap-6">
-            <a
-              className="text-subtext-light dark:text-[#909acb] text-sm hover:text-primary transition-colors"
-              href="#"
-            >
-              Privacy Policy
-            </a>
-            <a
-              className="text-subtext-light dark:text-[#909acb] text-sm hover:text-primary transition-colors"
-              href="#"
-            >
-              Terms of Service
-            </a>
+            <h3 className="text-xl font-extrabold tracking-tight mb-1 text-gray-900 dark:text-white">
+              Capa Pixelada
+            </h3>
+            <p className="text-xs sm:text-sm text-subtext-light dark:text-subtext-dark mb-4">
+              A imagem começa em baixa resolução. A cada erro, ganhe mais nitidez e dicas para identificar o álbum.
+            </p>
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400">
+              Escolher Gênero
+            </span>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-6">
-            <a
-              href="#"
-              className="text-subtext-light dark:text-[#909acb] hover:text-primary transition-colors"
-            >
-              <Twitter size={24} />
-            </a>
-            <a
-              href="#"
-              className="text-subtext-light dark:text-[#909acb] hover:text-primary transition-colors"
-            >
-              <Instagram size={24} />
-            </a>
-            <a
-              href="#"
-              className="text-subtext-light dark:text-[#909acb] hover:text-primary transition-colors"
-            >
-              <Facebook size={24} />
-            </a>
+          
+          <div
+            onClick={handlePlayThematic}
+            className="group relative p-6 rounded-3xl text-left border cursor-pointer transition-all duration-300 hover:-translate-y-1.5 bg-white/70 dark:bg-[#1a0b2e]/80 backdrop-blur-md border-border-light dark:border-[#7645d9]/40 hover:border-purple-500/50 shadow-lg hover:shadow-purple-500/20"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-[#ff00ff] flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Clock size={24} />
+              </div>
+              <span className="flex items-center gap-1 text-xs font-bold text-purple-600 dark:text-[#00ffff] group-hover:translate-x-1 transition-transform">
+                Entrar <ArrowRight size={14} />
+              </span>
+            </div>
+            <h3 className="text-xl font-extrabold tracking-tight mb-1 text-gray-900 dark:text-white">
+              Viagem no Tempo
+            </h3>
+            <p className="text-xs sm:text-sm text-subtext-light dark:text-subtext-dark mb-4">
+              Navegue pelas décadas de 70 a 2010 em um universo retro synthwave neon descobrindo discos lendários.
+            </p>
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-purple-600 dark:text-[#ff00ff]">
+              Explorar Eras
+            </span>
           </div>
+        </motion.div>
 
-          <p className="text-subtext-light dark:text-[#909acb] text-sm">
-            © 2025 Guess The Band. All rights reserved.
+        
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="mt-10 w-full max-w-2xl"
+        >
+          <p className="text-xs font-bold uppercase tracking-wider text-subtext-light dark:text-subtext-dark mb-3 flex items-center justify-center gap-1.5">
+            <Music size={14} />
+            Ou jogue direto com seu estilo musical favorito:
           </p>
-        </footer>
-      </div>
+          <div className="flex flex-wrap justify-center gap-2">
+            {Object.keys(ARTIST_MAP).map((genre) => (
+              <button
+                key={genre}
+                onClick={() => handleSelectGenre(genre)}
+                className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all duration-200 cursor-pointer bg-white/50 dark:bg-card-dark/50 border-border-light dark:border-border-dark hover:border-blue-500 hover:text-blue-500 dark:hover:text-blue-400 hover:scale-105"
+              >
+                {genre}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+      </main>
+
+      {/* Footer */}
+      <footer className="relative z-10 py-6 border-t border-border-light dark:border-border-dark/60 text-center text-xs text-subtext-light dark:text-subtext-dark">
+        <p>© 2025 GuesserBand • O jogo definitivo de adivinhação musical.</p>
+      </footer>
     </div>
   );
 };

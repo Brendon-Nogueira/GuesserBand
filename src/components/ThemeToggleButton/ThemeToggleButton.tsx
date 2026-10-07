@@ -1,35 +1,42 @@
+import React from "react";
 import { useTheme } from "../../context/ThemeContext/ThemeContext";
+import { Sun, Moon } from "lucide-react";
 
-export const ThemeToggleButton: React.FC = () => {
+interface ThemeToggleButtonProps {
+  showLabel?: boolean;
+  className?: string;
+}
+
+export const ThemeToggleButton: React.FC<ThemeToggleButtonProps> = ({
+  showLabel = false,
+  className = "",
+}) => {
   const { theme, toggleTheme } = useTheme();
 
   return (
     <button
-      className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
       onClick={toggleTheme}
-      aria-label="Toggle theme"
+      type="button"
+      className={`flex items-center gap-2 px-3 py-2 rounded-full border transition-all duration-300 hover:scale-105 cursor-pointer select-none ${
+        theme === "dark"
+          ? "bg-gray-800/80 border-gray-700 text-amber-300 hover:bg-gray-700 hover:border-gray-600"
+          : "bg-white/80 border-gray-300 text-indigo-600 hover:bg-gray-100 hover:border-gray-400 shadow-sm"
+      } ${className}`}
+      aria-label={`Alternar para modo ${theme === "dark" ? "claro" : "escuro"}`}
+      title={`Alternar para modo ${theme === "dark" ? "claro" : "escuro"}`}
     >
       {theme === "dark" ? (
-        // Exibe o ícone de 'light mode' quando o tema é 'dark' (para sugerir a mudança)
-        <svg
-          className="w-6 h-6"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <path d="M12 3a9 9 0 0 0 9 9 9 9 0 0 0-9-9zM4.1 4.1A10.02 10.02 0 0 1 12 2a10 10 0 0 1 7.9 4.1L12 12V3h-.1zM18.9 18.9A9.98 9.98 0 0 1 12 22a10 10 0 0 1-7.9-4.1L12 12v9.8zM2.1 21.9A10.02 10.02 0 0 1 12 22a10 10 0 0 1-7.9-4.1L12 12V3h-.1z" />
-        </svg>
+        <Sun size={18} className="animate-spin-slow text-amber-300" />
       ) : (
-        // Exibe o ícone de 'dark mode' quando o tema é 'light'
-        <svg
-          className="w-6 h-6"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <path d="M12 3a9 9 0 1 0 9 9c0-.44-.04-.88-.12-1.3A9 9 0 0 1 12 3z" />
-        </svg>
+        <Moon size={18} className="text-indigo-600" />
+      )}
+      {showLabel && (
+        <span className="text-xs font-semibold uppercase tracking-wider">
+          {theme === "dark" ? "Claro" : "Escuro"}
+        </span>
       )}
     </button>
   );
 };
+
+export default ThemeToggleButton;

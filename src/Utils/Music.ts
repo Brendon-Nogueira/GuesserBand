@@ -1,8 +1,5 @@
 import type { Album } from "../types/AlbumType/Album";
 
-const BACKEND_URL =
-  import.meta.env.MODE === "production" ? "" : "http://localhost:3001";
-
 export const ARTIST_MAP: Record<string, string[]> = {
   rock: [
     "Led Zeppelin",
@@ -404,31 +401,39 @@ export const ARTIST_MAP: Record<string, string[]> = {
   ],
 };
 
-async function getSpotifyToken(): Promise<string> {
-  let apiUrl: string;
+let cachedSpotifyToken: string | null = null;
+let tokenExpiryTime: number = 0;
 
-  // chamada vercel
-  if (import.meta.env.MODE === "production") {
-    apiUrl = "/api/spotify-token";
-  } else {
-    // chamada local
-    apiUrl = `${BACKEND_URL}/spotify-token`;
+export async function getSpotifyToken(): Promise<string> {
+  
+  if (cachedSpotifyToken && Date.now() < tokenExpiryTime) {
+    return cachedSpotifyToken;
   }
 
-  console.log("Buscando token Spotify em:", apiUrl);
+  
+  const candidateEndpoints = [
+    "/api/spotify-token",
+    "/spotify-token",
+    "http://localhost:3001/spotify-token",
+  ];
 
-  const response = await fetch(apiUrl);
-  // const response = await fetch(`${BACKEND_URL}/api/spotify-token`);
-  //const response = await fetch(`/api/spotify-token`);
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    console.error("Erro ao obter token da API:", errorData);
-    throw new Error(`Falha ao buscar token: ${response.statusText}`);
+  for (const endpoint of candidateEndpoints) {
+    try {
+      const response = await fetch(endpoint);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.access_token) {
+          cachedSpotifyToken = data.access_token;
+          tokenExpiryTime = Date.now() + 50 * 60 * 1000; 
+          return data.access_token;
+        }
+      }
+    } catch {
+     
+    }
   }
 
-  const data = await response.json();
-  return data.access_token;
+  throw new Error("Falha ao obter token do Spotify em todos os endpoints disponíveis.");
 }
 
 // Função para buscar álbuns no Spotify
@@ -511,91 +516,126 @@ export async function fetchAlbumsByGenre(
       }
 
       // Se chegou aqui, não achou álbuns válidos para este artista, tenta o próximo do loop
-      // console.log(`Tentativa ${i+1}: Nenhum álbum válido encontrado para ${randomArtist}, tentando outro...`);
     } catch (error) {
       console.error(`Erro na tentativa ${i + 1} com ${randomArtist}:`, error);
     }
   }
 
-  console.error("Falha ao encontrar álbuns após várias tentativas.");
-  return [];
+  console.warn("Utilizando álbuns de reserva (fallback offline).");
+  const fallbackMatch = FALLBACK_ALBUMS.filter(
+    (a) => a.genre.toLowerCase() === genre.toLowerCase()
+  );
+  return fallbackMatch.length > 0 ? fallbackMatch : FALLBACK_ALBUMS;
 }
+
+const FALLBACK_ALBUMS: Album[] = [
+  {
+    mbid: "queen-night-at-the-opera",
+    artist: "Queen",
+    albumTitle: "A Night at the Opera",
+    releaseYear: 1975,
+    coverArtUrl: "https://upload.wikimedia.org/wikipedia/en/4/4d/Queen_A_Night_At_The_Opera.png",
+    genre: "rock",
+  },
+  {
+    mbid: "pink-floyd-dark-side",
+    artist: "Pink Floyd",
+    albumTitle: "The Dark Side of the Moon",
+    releaseYear: 1973,
+    coverArtUrl: "https://upload.wikimedia.org/wikipedia/en/3/3b/Dark_Side_of_the_Moon.png",
+    genre: "rock",
+  },
+  {
+    mbid: "nirvana-nevermind",
+    artist: "Nirvana",
+    albumTitle: "Nevermind",
+    releaseYear: 1991,
+    coverArtUrl: "https://upload.wikimedia.org/wikipedia/en/b/b7/NirvanaNevermindalbumcover.jpg",
+    genre: "rock",
+  },
+  {
+    mbid: "metallica-master-of-puppets",
+    artist: "Metallica",
+    albumTitle: "Master of Puppets",
+    releaseYear: 1986,
+    coverArtUrl: "https://upload.wikimedia.org/wikipedia/en/b/b2/Metallica_-_Master_of_Puppets_cover.jpg",
+    genre: "rock",
+  },
+  {
+    mbid: "led-zeppelin-iv",
+    artist: "Led Zeppelin",
+    albumTitle: "Led Zeppelin IV",
+    releaseYear: 1971,
+    coverArtUrl: "https://upload.wikimedia.org/wikipedia/en/2/26/Led_Zeppelin_-_Led_Zeppelin_IV.jpg",
+    genre: "rock",
+  },
+  {
+    mbid: "acdc-back-in-black",
+    artist: "AC/DC",
+    albumTitle: "Back in Black",
+    releaseYear: 1980,
+    coverArtUrl: "https://upload.wikimedia.org/wikipedia/commons/3/3e/Acdc_backinblack_cover.jpg",
+    genre: "rock",
+  },
+  {
+    mbid: "beatles-abbey-road",
+    artist: "The Beatles",
+    albumTitle: "Abbey Road",
+    releaseYear: 1969,
+    coverArtUrl: "https://upload.wikimedia.org/wikipedia/en/4/42/Beatles_-_Abbey_Road.jpg",
+    genre: "rock",
+  },
+  {
+    mbid: "guns-appetite",
+    artist: "Guns N' Roses",
+    albumTitle: "Appetite for Destruction",
+    releaseYear: 1987,
+    coverArtUrl: "https://upload.wikimedia.org/wikipedia/en/6/60/GunsnRosesAppetiteforDestructionalbumcover.jpg",
+    genre: "rock",
+  },
+  {
+    mbid: "michael-jackson-thriller",
+    artist: "Michael Jackson",
+    albumTitle: "Thriller",
+    releaseYear: 1982,
+    coverArtUrl: "https://upload.wikimedia.org/wikipedia/en/5/55/Michael_Jackson_-_Thriller.png",
+    genre: "pop",
+  },
+  {
+    mbid: "arctic-monkeys-am",
+    artist: "Arctic Monkeys",
+    albumTitle: "AM",
+    releaseYear: 2013,
+    coverArtUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e7/%22AM%22_%28Arctic_Monkeys%29.jpg",
+    genre: "indie",
+  },
+];
 
 // Busca álbuns por década (Thematic Mode)
 export async function fetchAlbumsByDecade(
   decade: string,
   lastArtist: string | null = null
 ): Promise<Album[]> {
-  const token = await getSpotifyToken();
+  try {
+    const token = await getSpotifyToken();
+    const decadeMap: Record<string, string> = {
+      "70s": "1970-1979",
+      "80s": "1980-1989",
+      "90s": "1990-1999",
+      "2000s": "2000-2009",
+      "2010s": "2010-2019",
+    };
+    const yearRange = decadeMap[decade] || "2020-2024";
+    const validGenres = ["rock", "pop", "metal", "indie", "alternative"];
+    const randomGenre = validGenres[Math.floor(Math.random() * validGenres.length)];
 
-  // Mapeamento de décadas para anos
-  const decadeMap: Record<string, string> = {
-    "70s": "1970-1979",
-    "80s": "1980-1989",
-    "90s": "1990-1999",
-    "2000s": "2000-2009",
-    "2010s": "2010-2019",
-  };
+    const response = await fetch(
+      `https://api.spotify.com/v1/search?q=year:${yearRange} genre:${randomGenre}&type=album&limit=30`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-  const yearRange = decadeMap[decade] || "2020-2024";
-
-  // Lista de gêneros
-  const validGenres = [
-    "rock",
-    "pop",
-    "metal",
-    "indie",
-    "alternative",
-    "metal core",
-  ];
-  const maxRetries = 5;
-
-  for (let i = 0; i < maxRetries; i++) {
-    const randomGenre =
-      validGenres[Math.floor(Math.random() * validGenres.length)];
-
-    // Configuração de tentativa progressiva com maior entropia:
-    // 0: Offset 0-500 + gênero (Alta variedade)
-    // 1: Offset 0-250 + gênero (Média variedade)
-    // 2: Offset 0-50 + gênero (Alta probabilidade)
-    // 3: Offset 0 + gênero (Segurança no gênero)
-    // 4: Offset 0 + sem gênero (Fallback total)
-
-    let queryOffset = 0;
-    let queryGenreString = ` genre:${randomGenre}`;
-
-    if (i === 0) {
-      queryOffset = Math.floor(Math.random() * 500);
-    } else if (i === 1) {
-      queryOffset = Math.floor(Math.random() * 250);
-    } else if (i === 2) {
-      queryOffset = Math.floor(Math.random() * 50);
-    } else if (i === 3) {
-      queryOffset = 0;
-    } else {
-      queryOffset = 0;
-      queryGenreString = "";
-    }
-
-    try {
-      const response = await fetch(
-        `https://api.spotify.com/v1/search?q=year:${yearRange}${queryGenreString}&type=album&limit=50&offset=${queryOffset}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      if (!response.ok) {
-        console.warn(
-          `Erro ao buscar álbuns da década ${decade} (Tentativa ${i + 1}): ${
-            response.status
-          }`
-        );
-        continue;
-      }
-
+    if (response.ok) {
       const data = await response.json();
-
       const retornoTratado: Album[] =
         data.albums?.items
           ?.filter((item: any) => item.album_type === "album")
@@ -606,24 +646,15 @@ export async function fetchAlbumsByDecade(
             releaseYear: parseInt(item.release_date?.split("-")[0] ?? "0"),
             coverArtUrl: item.images?.[0]?.url ?? "",
           }))
-          // Remove o artista anterior se houver
-          .filter(
-            (album: Album) => !lastArtist || album.artist !== lastArtist
-          ) || [];
+          .filter((album: Album) => !lastArtist || album.artist !== lastArtist) || [];
 
-      if (retornoTratado.length > 0) {
-        return retornoTratado;
-      }
-    } catch (error) {
-      console.error(
-        `Erro ao buscar álbuns da década ${decade} (Tentativa ${i + 1}):`,
-        error
-      );
+      if (retornoTratado.length > 0) return retornoTratado;
     }
+  } catch (error) {
+    console.warn("Erro ao buscar década via API, usando fallback:", error);
   }
 
-  console.error("Falha ao encontrar álbuns por década após várias tentativas.");
-  return [];
+  return FALLBACK_ALBUMS;
 }
 
 // Busca artistas para o autocomplete (Thematic Mode)

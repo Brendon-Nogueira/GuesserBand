@@ -7,13 +7,36 @@ interface SpotifyTokenResponse {
   expires_in: number;
 }
 
+
+let cachedToken: string | null = null;
+let tokenExpiresAt = 0;
+
 export default async (req: VercelRequest, res: VercelResponse) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+ 
+  const origin = (req.headers.origin as string) || "";
+  const isAllowedOrigin =
+    !origin ||
+    origin.includes("github.io") ||
+    origin.includes("localhost") ||
+    origin.includes("vercel.app");
+
+  if (isAllowedOrigin && origin) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  } else {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+  }
+
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Content-Type", "application/json");
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
+  }
+
+  
+  const now = Date.now();
+  if (cachedToken && now < tokenExpiresAt - 60000) {
+    return res.status(200).json({ access_token: cachedToken });
   }
 
   try {
@@ -22,8 +45,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
 
     if (!clientId || !clientSecret) {
       return res.status(500).json({
-        error: "Configuração de ambiente ausente",
-        details: "SPOTIFY_CLIENT_ID ou SECRET não definidos no Vercel.",
+        error: "Configuração do servidor ausente",
       });
     }
 
@@ -43,8 +65,8 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     );
 
     const data = response.data;
-
-    console.log("Token obtido com sucesso:", data.access_token);
+    cachedToken = data.access_token;
+    tokenExpiresAt = now + (data.expires_in || 3600) * 1000;
 
     res.status(200).json({ access_token: data.access_token });
   } catch (error) {
@@ -53,14 +75,13 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       message: string;
     };
 
-    const statusCode = axiosError.response ? axiosError.response.status : 500;
-    const details = axiosError.response
-      ? axiosError.response.data
-      : axiosError.message;
+    console.error("Erro seguro ao obter token do Spotify:", axiosError.message);
+    const statusCode = axiosError.response?.status || 502;
 
+    
     res.status(statusCode).json({
-      error: "Erro ao obter token",
-      details: details,
+      error: "Falha na autenticação com serviço de streaming",
     });
   }
 };
+

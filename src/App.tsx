@@ -7,10 +7,10 @@ import {
 
 import Home from "./pages/Home/Home";
 import Game from "./pages/Game/Game";
+import ThematicGame from "./pages/Game/ThematicGame";
+import Musicdle from "./pages/Musicdle/Musicdle";
 import { ThemeProvider } from "./context/ThemeContext/ThemeContext";
 import { GameProvider } from "./context/GameContext/GameContext";
-
-import ThematicGame from "./pages/Game/ThematicGame";
 
 function App() {
   return (
@@ -18,28 +18,25 @@ function App() {
       <GameProvider>
         <Router>
           <Routes>
-            {/* Redireciona a raiz diretamente para a Home */}
-            <Route
-              path="/"
-              element={<Navigate to="/guess-the-band" replace />}
-            />
+            
+            <Route path="/" element={<Home />} />
+            <Route path="/game" element={<Game />} />
+            <Route path="/modo-tematico" element={<ThematicGame />} />
+            <Route path="/musicdle" element={<Musicdle />} />
 
-            {/* Home */}
+            
             <Route path="/guess-the-band" element={<Home />} />
-
-            {/* Modo normal */}
             <Route path="/guess-the-band/game" element={<Game />} />
-
-            {/* Modo temático */}
             <Route
               path="/guess-the-band/modo-tematico"
               element={<ThematicGame />}
             />
+            <Route path="/guess-the-band/musicdle" element={<Musicdle />} />
 
             {/* Caso a rota não exista */}
             <Route
               path="*"
-              element={<Navigate to="/guess-the-band" replace />}
+              element={<Navigate to="/" replace />}
             />
           </Routes>
         </Router>

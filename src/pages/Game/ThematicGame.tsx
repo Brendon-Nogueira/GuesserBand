@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { fetchAlbumsByDecade, searchArtists } from "../../Utils/Music";
 import type { Album } from "../../types/AlbumType/Album";
 import AlbumCover from "../../components/AlbumCover/AlbumCover";
@@ -66,19 +66,40 @@ const ThematicGame: React.FC = () => {
     loadAlbum();
   }, [selectedDecade]);
 
-  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setGuess(value);
 
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
     // Permitir busca mesmo se feedback == "error" (para o usuário corrigir)
     // Se feedback == "success", o input está disabled, então não chega aqui
-    if (value.length > 1) {
-      const results = await searchArtists(value);
-      setSuggestions(results.slice(0, 5));
+    if (value.trim().length > 1) {
+      debounceTimeoutRef.current = setTimeout(async () => {
+        try {
+          const results = await searchArtists(value.trim());
+          setSuggestions(results.slice(0, 5));
+        } catch {
+          setSuggestions([]);
+        }
+      }, 300);
     } else {
       setSuggestions([]);
     }
   };
+
 
   const handleSelectSuggestion = (artistName: string) => {
     setGuess(artistName);
