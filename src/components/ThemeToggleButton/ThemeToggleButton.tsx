@@ -31,7 +31,7 @@ export const ThemeToggleButton: React.FC<ThemeToggleButtonProps> = ({
         <Moon size={18} className="text-indigo-600" />
       )}
       {showLabel && (
-        <span className="text-xs font-semibold uppercase tracking-wider">
+        <span className="text-xs font-semibold uppercase tracking-wider hidden sm:inline">
           {theme === "dark" ? "Claro" : "Escuro"}
         </span>
       )}

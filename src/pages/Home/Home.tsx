@@ -43,12 +43,12 @@ const Home: React.FC = () => {
       </div>
 
       {/* Conteúdo */}
-      <header className="relative z-20 flex items-center justify-between px-6 sm:px-12 py-5 max-w-7xl w-full mx-auto">
-        <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/25">
-            <Disc3 size={22} className="animate-spin-slow" />
+      <header className="relative z-20 flex items-center justify-between px-4 sm:px-12 py-3.5 sm:py-5 max-w-7xl w-full mx-auto">
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/25">
+            <Disc3 size={20} className="animate-spin-slow" />
           </div>
-          <span className="font-extrabold text-lg sm:text-xl tracking-tight bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600 bg-clip-text text-transparent">
+          <span className="font-extrabold text-base sm:text-xl tracking-tight bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600 bg-clip-text text-transparent">
             GuesserBand
           </span>
         </div>
@@ -62,7 +62,7 @@ const Home: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 mb-5"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 mb-4 sm:mb-5"
         >
           <Sparkles size={14} />
           <span>O Desafio Definitivo para Amantes de Música</span>
@@ -73,7 +73,7 @@ const Home: React.FC = () => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.1] max-w-3xl"
+          className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.15] max-w-3xl"
         >
           Adivinhe suas bandas favoritas em{" "}
           <span className="bg-gradient-to-r from-blue-500 via-indigo-400 to-purple-500 bg-clip-text text-transparent">
@@ -86,7 +86,7 @@ const Home: React.FC = () => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mt-3 text-sm sm:text-base text-subtext-light dark:text-subtext-dark max-w-xl mx-auto leading-relaxed"
+          className="mt-3 text-xs sm:text-base text-subtext-light dark:text-subtext-dark max-w-xl mx-auto leading-relaxed"
         >
           Do clássico mistério das capas pixeladas ao novo modo estilo Loldle com atributos comparativos em tempo real.
         </motion.p>
@@ -96,12 +96,12 @@ const Home: React.FC = () => {
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-8 w-full max-w-5xl"
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 mt-6 sm:mt-8 w-full max-w-5xl"
         >
          
           <div
             onClick={handlePlayMusicdle}
-            className="group relative p-6 rounded-3xl text-left border cursor-pointer transition-all duration-300 hover:-translate-y-1.5 bg-gradient-to-b from-blue-500/10 via-white/80 to-white/40 dark:from-blue-600/20 dark:via-gray-900/90 dark:to-gray-900/60 backdrop-blur-md border-blue-500/40 hover:border-blue-500 shadow-xl hover:shadow-blue-500/25 ring-2 ring-blue-500/20"
+            className="group relative p-5 sm:p-6 rounded-2xl sm:rounded-3xl text-left border cursor-pointer transition-all duration-300 hover:-translate-y-1.5 active:scale-98 bg-gradient-to-b from-blue-500/10 via-white/80 to-white/40 dark:from-blue-600/20 dark:via-gray-900/90 dark:to-gray-900/60 backdrop-blur-md border-blue-500/40 hover:border-blue-500 shadow-xl hover:shadow-blue-500/25 ring-2 ring-blue-500/20"
           >
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-md shadow-blue-600/30">
@@ -125,7 +125,7 @@ const Home: React.FC = () => {
           
           <div
             onClick={handlePlayNow}
-            className="group relative p-6 rounded-3xl text-left border cursor-pointer transition-all duration-300 hover:-translate-y-1.5 bg-white/70 dark:bg-card-dark/80 backdrop-blur-md border-border-light dark:border-border-dark hover:border-indigo-500/50 shadow-lg hover:shadow-indigo-500/15"
+            className="group relative p-5 sm:p-6 rounded-2xl sm:rounded-3xl text-left border cursor-pointer transition-all duration-300 hover:-translate-y-1.5 active:scale-98 bg-white/70 dark:bg-card-dark/80 backdrop-blur-md border-border-light dark:border-border-dark hover:border-indigo-500/50 shadow-lg hover:shadow-indigo-500/15"
           >
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -149,7 +149,7 @@ const Home: React.FC = () => {
           
           <div
             onClick={handlePlayThematic}
-            className="group relative p-6 rounded-3xl text-left border cursor-pointer transition-all duration-300 hover:-translate-y-1.5 bg-white/70 dark:bg-[#1a0b2e]/80 backdrop-blur-md border-border-light dark:border-[#7645d9]/40 hover:border-purple-500/50 shadow-lg hover:shadow-purple-500/20"
+            className="group relative p-5 sm:p-6 rounded-2xl sm:rounded-3xl text-left border cursor-pointer transition-all duration-300 hover:-translate-y-1.5 active:scale-98 bg-white/70 dark:bg-[#1a0b2e]/80 backdrop-blur-md border-border-light dark:border-[#7645d9]/40 hover:border-purple-500/50 shadow-lg hover:shadow-purple-500/20"
           >
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-[#ff00ff] flex items-center justify-center group-hover:scale-110 transition-transform">

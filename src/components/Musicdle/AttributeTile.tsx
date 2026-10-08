@@ -37,26 +37,26 @@ export const AttributeTile: React.FC<AttributeTileProps> = ({
         delay: delayIndex * 0.12,
         ease: "easeOut",
       }}
-      className={`relative flex flex-col items-center justify-center p-2.5 sm:p-3 text-center rounded-xl border font-bold text-xs sm:text-sm select-none min-h-[72px] sm:min-h-[84px] transition-transform hover:scale-102 ${statusClasses}`}
+      className={`relative flex flex-col items-center justify-center p-1.5 sm:p-2.5 md:p-3 text-center rounded-xl border font-bold text-[11px] sm:text-xs md:text-sm select-none min-h-[68px] sm:min-h-[80px] transition-transform hover:scale-102 ${statusClasses}`}
     >
       {label && (
-        <span className="text-[10px] sm:text-xs font-semibold opacity-75 uppercase tracking-wider mb-0.5">
+        <span className="text-[9px] sm:text-[10px] font-semibold opacity-75 uppercase tracking-wider mb-0.5">
           {label}
         </span>
       )}
 
-      <div className="flex items-center justify-center gap-1 leading-snug break-words">
+      <div className="flex items-center justify-center gap-1 leading-snug break-words px-1">
         <span>{value}</span>
 
         {direction === "higher" && (
           <ArrowUp
-            size={18}
+            size={16}
             className="animate-bounce text-white drop-shadow-md flex-shrink-0"
           />
         )}
         {direction === "lower" && (
           <ArrowDown
-            size={18}
+            size={16}
             className="animate-bounce text-white drop-shadow-md flex-shrink-0"
           />
         )}

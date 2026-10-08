@@ -27,14 +27,14 @@ export const GuessRow: React.FC<GuessRowProps> = ({ evaluation }) => {
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className="flex flex-col items-center justify-center p-1.5 sm:p-2 rounded-xl bg-gray-900 text-white text-center border border-gray-700 overflow-hidden shadow-md"
+        className="flex flex-col items-center justify-center p-1 sm:p-2 rounded-xl bg-gray-900 text-white text-center border border-gray-700 overflow-hidden shadow-md min-h-[68px] sm:min-h-[80px]"
       >
         <BandAvatar
           src={guessedBand.image}
           name={guessedBand.name}
-          className="w-8 h-8 sm:w-11 sm:h-11 rounded-full border border-white/20 mb-1"
+          className="w-7 h-7 sm:w-10 sm:h-10 rounded-full border border-white/20 mb-1"
         />
-        <span className="text-[11px] sm:text-xs font-bold leading-tight truncate max-w-full px-1">
+        <span className="text-[10px] sm:text-xs font-bold leading-tight truncate max-w-full px-1">
           {guessedBand.name}
         </span>
       </motion.div>
@@ -49,7 +49,7 @@ export const GuessRow: React.FC<GuessRowProps> = ({ evaluation }) => {
       {/* Gêneros */}
       <AttributeTile
         value={
-          <span className="text-[11px] sm:text-xs line-clamp-2">
+          <span className="text-[10px] sm:text-xs line-clamp-2 leading-tight">
             {guessedBand.genres.join(", ")}
           </span>
         }
@@ -60,9 +60,9 @@ export const GuessRow: React.FC<GuessRowProps> = ({ evaluation }) => {
       {/* País */}
       <AttributeTile
         value={
-          <div className="flex flex-col items-center">
-            <span className="text-base sm:text-lg mb-0.5">{guessedBand.flag}</span>
-            <span className="text-[10px] sm:text-xs truncate max-w-full">
+          <div className="flex flex-col items-center leading-tight">
+            <span className="text-sm sm:text-base md:text-lg mb-0.5">{guessedBand.flag}</span>
+            <span className="text-[9px] sm:text-[11px] md:text-xs truncate max-w-full">
               {guessedBand.country}
             </span>
           </div>

@@ -50,7 +50,7 @@ const AlbumCover: React.FC<AlbumCoverProps> = ({ url, pixelLevel }) => {
       ref={canvasRef}
       width={400}
       height={400}
-      className="rounded-xl shadow-md"
+      className="rounded-xl shadow-md w-full max-w-[300px] sm:max-w-[400px] h-auto aspect-square object-contain"
       initial={{ opacity: 0.5, scale: 0.95 }}
       animate={{
         opacity: 1,

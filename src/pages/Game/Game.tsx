@@ -188,20 +188,20 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
     >
       {/* Header */}
       <header
-        className={`flex items-center justify-between px-4 sm:px-10 py-3 border-b ${
+        className={`flex items-center justify-between px-3 sm:px-10 py-2.5 sm:py-3 border-b ${
           theme === "dark" ? "border-gray-700" : "border-gray-300"
         }`}
       >
-        <h1 className="text-lg font-bold">
+        <h1 className="text-base sm:text-lg font-bold">
           <a href="/">GUESS THE BAND</a>
         </h1>
-        <div className="flex items-center gap-3">
-          <p>Pontuação: {score}</p>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <p className="text-xs sm:text-sm font-medium">Pontuação: {score}</p>
 
           {/* Toggle de tema */}
           <button
             onClick={toggleTheme}
-            className={`px-3 py-1 rounded-full text-sm font-semibold ${
+            className={`px-2.5 py-1 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-semibold cursor-pointer ${
               theme === "dark"
                 ? "bg-gray-800 text-white hover:bg-gray-700"
                 : "bg-gray-200 text-gray-900 hover:bg-gray-300"
@@ -213,12 +213,12 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
       </header>
 
       {/* Seletor de gênero */}
-      <div className="flex justify-center gap-3 mt-6 flex-wrap">
+      <div className="flex justify-center gap-1.5 sm:gap-3 mt-4 sm:mt-6 px-3 flex-wrap">
         {["rock", "pop", "indie", "80s", "metalcore"].map((genre) => (
           <button
             key={genre}
             onClick={() => setSelectedGenre(genre)}
-            className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
               selectedGenre === genre
                 ? "bg-blue-600 text-white"
                 : theme === "dark"
@@ -331,16 +331,16 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
             )}
 
             {/* Buttons */}
-            <div className="flex gap-4 w-full justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full justify-center">
               <button
                 onClick={() => loadAlbum()}
-                className="bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg hover:scale-105 transition-transform"
+                className="w-full sm:w-auto bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg hover:scale-105 active:scale-95 transition-transform cursor-pointer"
               >
                 Tentar Novamente
               </button>
               <button
                 onClick={() => loadAlbum()}
-                className={`font-semibold py-3 px-6 rounded-lg hover:scale-105 transition-transform ${
+                className={`w-full sm:w-auto font-semibold py-3 px-6 rounded-lg hover:scale-105 active:scale-95 transition-transform cursor-pointer ${
                   feedback === "success"
                     ? "bg-blue-600 text-white"
                     : "bg-red-600 text-white"
@@ -405,10 +405,10 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
                 </div>
 
                 {/* Input e Botão */}
-                <div className="w-full max-w-lg flex flex-col sm:flex-row items-end gap-2 mt-2">
-                  <div className="relative w-full">
+                <div className="w-full max-w-lg flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mt-2">
+                  <div className="relative w-full flex-1">
                     <input
-                      className={`form-input w-full rounded-lg h-14 p-[15px] focus:outline-none ${
+                      className={`form-input w-full rounded-lg h-12 sm:h-14 p-3 sm:p-[15px] text-base sm:text-sm focus:outline-none ${
                         theme === "dark"
                           ? "bg-gray-800 text-white"
                           : "bg-gray-200 text-gray-900"
@@ -432,7 +432,7 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
                         {suggestions.map((artist, index) => (
                           <li
                             key={index}
-                            className={`p-3 cursor-pointer hover:${
+                            className={`p-3 cursor-pointer text-sm hover:${
                               theme === "dark" ? "bg-gray-600" : "bg-gray-100"
                             }`}
                             onClick={() => {
@@ -451,7 +451,7 @@ const Game: React.FC<GameProps> = ({ thematic }) => {
                   <button
                     onClick={handleGuess}
                     disabled={attemptsLeft === 0 || feedback === "success"}
-                    className="h-14 px-6 bg-blue-600 text-white font-bold rounded-lg hover:scale-105 transition-transform whitespace-nowrap"
+                    className="w-full sm:w-auto h-12 sm:h-14 px-6 bg-blue-600 text-white font-bold rounded-lg hover:scale-105 active:scale-95 transition-transform whitespace-nowrap cursor-pointer shadow-md"
                   >
                     Adivinhar
                   </button>

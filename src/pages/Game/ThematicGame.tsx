@@ -160,12 +160,12 @@ const ThematicGame: React.FC = () => {
         </svg>
       </div>
 
-      <header className="flex items-center justify-between px-6 py-4 border-b border-[#7645d9]/30 relative z-10 bg-[#1a0b2e]/80 backdrop-blur-md">
-        <h1 className="text-xl font-bold tracking-widest uppercase text-[#ff00ff] drop-shadow-[0_0_10px_rgba(255,0,255,0.5)]">
+      <header className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 border-b border-[#7645d9]/30 relative z-10 bg-[#1a0b2e]/80 backdrop-blur-md">
+        <h1 className="text-sm sm:text-xl font-bold tracking-wider sm:tracking-widest uppercase text-[#ff00ff] drop-shadow-[0_0_10px_rgba(255,0,255,0.5)]">
           <a href="/">Modo Viagem no Tempo</a>
         </h1>
-        <div className="flex items-center gap-4">
-          <p className="font-mono text-[#00ffff]">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <p className="font-mono text-xs sm:text-base text-[#00ffff]">
             PONTOS: {score.toString().padStart(6, "0")}
           </p>
         </div>
@@ -176,14 +176,14 @@ const ThematicGame: React.FC = () => {
         <RankingBoard mode="thematic" refreshTrigger={refreshRanking} />
       </div>
 
-      <div className="flex justify-center gap-4 mt-6 flex-wrap relative z-10">
+      <div className="flex justify-center gap-2 sm:gap-4 mt-4 sm:mt-6 px-3 flex-wrap relative z-10">
         {DECADES.map((decade) => (
           <button
             key={decade}
             onClick={() => setSelectedDecade(decade)}
-            className={`px-6 py-2 rounded-lg font-bold text-sm uppercase tracking-wider transition-all duration-300 border-2 ${
+            className={`px-3.5 py-1.5 sm:px-6 sm:py-2 rounded-lg font-bold text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 border-2 cursor-pointer ${
               selectedDecade === decade
-                ? "bg-[#ff00ff] border-[#ff00ff] text-[#1a0b2e] shadow-[0_0_20px_rgba(255,0,255,0.6)] scale-110"
+                ? "bg-[#ff00ff] border-[#ff00ff] text-[#1a0b2e] shadow-[0_0_20px_rgba(255,0,255,0.6)] scale-105 sm:scale-110"
                 : "bg-transparent border-[#00ffff] text-[#00ffff] hover:bg-[#00ffff]/10 hover:shadow-[0_0_10px_rgba(0,255,255,0.4)]"
             }`}
           >
@@ -292,7 +292,7 @@ const ThematicGame: React.FC = () => {
               </div>
             </div>
 
-            <div className="w-full max-w-lg flex gap-2 relative">
+            <div className="w-full max-w-lg flex flex-col sm:flex-row gap-2 relative">
               <div className="flex-1 relative">
                 <input
                   value={guess}
@@ -300,7 +300,7 @@ const ThematicGame: React.FC = () => {
                   onKeyDown={(e) => e.key === "Enter" && handleGuess()}
                   disabled={feedback === "success"}
                   placeholder="Identifique a anomalia temporal..."
-                  className="w-full bg-[#1a0b2e] border-2 border-[#7645d9] focus:border-[#00ffff] text-[#00ffff] placeholder-[#7645d9] rounded-lg px-4 py-3 outline-none transition-colors"
+                  className="w-full bg-[#1a0b2e] border-2 border-[#7645d9] focus:border-[#00ffff] text-[#00ffff] placeholder-[#7645d9] rounded-lg px-4 py-3 outline-none transition-colors text-base sm:text-sm"
                 />
 
                 {suggestions.length > 0 && !feedback && (
@@ -309,7 +309,7 @@ const ThematicGame: React.FC = () => {
                       <li
                         key={index}
                         onClick={() => handleSelectSuggestion(artist)}
-                        className="px-4 py-2 hover:bg-[#7645d9] text-[#00ffff] cursor-pointer transition-colors border-b border-[#7645d9]/30 last:border-0"
+                        className="px-4 py-2 hover:bg-[#7645d9] text-[#00ffff] cursor-pointer transition-colors border-b border-[#7645d9]/30 last:border-0 text-sm"
                       >
                         {artist}
                       </li>
@@ -320,7 +320,7 @@ const ThematicGame: React.FC = () => {
 
               <button
                 onClick={() => handleGuess()}
-                className="px-6 py-3 bg-[#ff00ff] text-[#1a0b2e] font-black rounded-lg hover:bg-[#ff40ff] transition-transform active:scale-95 uppercase tracking-wider"
+                className="w-full sm:w-auto px-6 py-3 bg-[#ff00ff] text-[#1a0b2e] font-black rounded-lg hover:bg-[#ff40ff] transition-transform active:scale-95 uppercase tracking-wider cursor-pointer"
               >
                 HACK
               </button>

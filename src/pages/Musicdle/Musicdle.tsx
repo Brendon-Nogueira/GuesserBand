@@ -18,10 +18,45 @@ import {
   Music,
 } from "lucide-react";
 
+export type MusicdleCategory = "all" | "metalcore" | "brazil" | "classics";
+
+const CATEGORIES: { id: MusicdleCategory; label: string; icon: string }[] = [
+  { id: "all", label: "Todas as Bandas", icon: "🔥" },
+  { id: "metalcore", label: "Metalcore & Metal", icon: "⚡" },
+  { id: "brazil", label: "Brasil / Nacional", icon: "🇧🇷" },
+  { id: "classics", label: "Rock Clássico & Alternativo", icon: "🎸" },
+];
+
 export const Musicdle: React.FC = () => {
   const { theme } = useTheme();
+  const [selectedCategory, setSelectedCategory] =
+    useState<MusicdleCategory>("all");
 
-  // banda  aleatória
+  const getCategoryBands = (cat: MusicdleCategory): BandData[] => {
+    switch (cat) {
+      case "metalcore":
+        return BAND_DATABASE.filter((b) =>
+          b.genres.some((g) =>
+            /metalcore|death|djent|deathcore|heavy metal|thrash|groove|nu metal|industrial|metal|post-hardcore/i.test(
+              g
+            )
+          )
+        );
+      case "brazil":
+        return BAND_DATABASE.filter(
+          (b) => b.country === "Brasil" || b.flag === "🇧🇷"
+        );
+      case "classics":
+        return BAND_DATABASE.filter(
+          (b) =>
+            b.country !== "Brasil" &&
+            !b.genres.some((g) => /metalcore|djent|deathcore/i.test(g))
+        );
+      default:
+        return BAND_DATABASE;
+    }
+  };
+
   const [targetBand, setTargetBand] = useState<BandData>(() => {
     return BAND_DATABASE[Math.floor(Math.random() * BAND_DATABASE.length)];
   });
@@ -30,11 +65,25 @@ export const Musicdle: React.FC = () => {
   const [isWin, setIsWin] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
+  // Troca de categoria
+  const handleSelectCategory = (cat: MusicdleCategory) => {
+    if (cat === selectedCategory) return;
+    setSelectedCategory(cat);
+    const pool = getCategoryBands(cat);
+    const newTarget =
+      pool[Math.floor(Math.random() * pool.length)] || BAND_DATABASE[0];
+    setTargetBand(newTarget);
+    setEvaluations([]);
+    setIsWin(false);
+  };
+
   // Reiniciar partida
   const handleRestart = () => {
-    const remainingBands = BAND_DATABASE.filter((b) => b.id !== targetBand.id);
+    const pool = getCategoryBands(selectedCategory);
+    const remainingBands = pool.filter((b) => b.id !== targetBand.id);
     const newTarget =
       remainingBands[Math.floor(Math.random() * remainingBands.length)] ||
+      pool[0] ||
       BAND_DATABASE[0];
 
     setTargetBand(newTarget);
@@ -66,16 +115,16 @@ export const Musicdle: React.FC = () => {
     >
       {/* Header */}
       <header
-        className={`sticky top-0 z-40 border-b backdrop-blur-md px-4 sm:px-8 py-3.5 flex items-center justify-between transition-colors ${
+        className={`sticky top-0 z-40 border-b backdrop-blur-md px-3 sm:px-8 py-2.5 sm:py-3.5 flex items-center justify-between transition-colors ${
           theme === "dark"
             ? "border-gray-800/80 bg-[#090b14]/85"
             : "border-gray-200/80 bg-white/85 shadow-sm"
         }`}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Link
             to="/"
-            className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-transparent hover:border-gray-300 dark:hover:border-gray-700 hover:bg-black/5 dark:hover:bg-white/5 transition-all text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+            className="flex items-center gap-1.5 text-xs font-semibold px-2 sm:px-2.5 py-1.5 rounded-lg border border-transparent hover:border-gray-300 dark:hover:border-gray-700 hover:bg-black/5 dark:hover:bg-white/5 transition-all text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
             title="Voltar ao início"
           >
             <ArrowLeft size={16} />
@@ -86,14 +135,13 @@ export const Musicdle: React.FC = () => {
             <h1 className="text-base sm:text-lg font-black tracking-tight bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent">
               Musicdle
             </h1>
-           
           </div>
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => setShowHelp((prev) => !prev)}
-            className="p-2 rounded-full border border-gray-300 dark:border-gray-700 hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-gray-500 dark:text-gray-400"
+            className="p-2 rounded-full border border-gray-300 dark:border-gray-700 hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-gray-500 dark:text-gray-400 cursor-pointer"
             title="Como jogar"
           >
             <HelpCircle size={18} />
@@ -104,10 +152,10 @@ export const Musicdle: React.FC = () => {
       </header>
 
       {/* Container */}
-      <main className="flex-1 w-full max-w-4xl mx-auto px-3 sm:px-6 py-6 flex flex-col items-center">
+      <main className="flex-1 w-full max-w-4xl mx-auto px-3 sm:px-6 py-4 sm:py-6 flex flex-col items-center">
         {/* Título e Subtítulo */}
-        <div className="text-center max-w-xl mx-auto mb-6">
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+        <div className="text-center max-w-xl mx-auto mb-4 sm:mb-6 px-1">
+          <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight">
             Adivinhe a Banda Misteriosa
           </h2>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -146,6 +194,29 @@ export const Musicdle: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Seletor de Categoria / Vertente Musical */}
+        <div className="w-full max-w-xl mb-4 sm:mb-5">
+          <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-center text-gray-400 dark:text-gray-500 mb-2">
+            Sorteando mistério da vertente:
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => handleSelectCategory(cat.id)}
+                className={`px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95 ${
+                  selectedCategory === cat.id
+                    ? "bg-blue-600 text-white shadow-blue-500/30 ring-2 ring-blue-500/50 scale-102"
+                    : "bg-white/60 dark:bg-gray-800/60 hover:bg-white dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
+                }`}
+              >
+                <span>{cat.icon}</span>
+                <span>{cat.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* Input */}
         <div className="w-full mb-6">
@@ -226,32 +297,42 @@ export const Musicdle: React.FC = () => {
 
      
         <div className="w-full">
-          <div className="grid grid-cols-6 gap-1.5 sm:gap-2.5 px-2 py-2 text-center text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 select-none">
-            <div>Banda</div>
-            <div>Formato</div>
-            <div>Gêneros</div>
-            <div>País</div>
-            <div>Ano</div>
-            <div>Membros</div>
-          </div>
+          {evaluations.length > 0 && (
+            <p className="sm:hidden text-center text-[11px] text-gray-400 dark:text-gray-500 mb-2 flex items-center justify-center gap-1 select-none">
+              <span>↔️</span> Deslize para o lado para ver todos os atributos
+            </p>
+          )}
 
-          {/* Lista de Palpites */}
-          <div className="space-y-2.5 mt-1">
-            {evaluations.length === 0 ? (
-              <div className="py-16 text-center text-gray-400 dark:text-gray-600 space-y-2">
-                <Music size={36} className="mx-auto opacity-30 animate-pulse" />
-                <p className="text-sm font-medium">
-                  Nenhum palpite enviado ainda.
-                </p>
-                <p className="text-xs opacity-75">
-                  Digite qualquer banda clássica no campo acima para começar a receber as dicas!
-                </p>
+          <div className="w-full overflow-x-auto pb-4 pt-1 -mx-2 px-2 sm:mx-0 sm:px-0">
+            <div className="min-w-[600px] sm:min-w-0 w-full">
+              <div className="grid grid-cols-6 gap-1.5 sm:gap-2.5 px-2 py-2 text-center text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 select-none">
+                <div>Banda</div>
+                <div>Formato</div>
+                <div>Gêneros</div>
+                <div>País</div>
+                <div>Ano</div>
+                <div>Membros</div>
               </div>
-            ) : (
-              evaluations.map((evaluation) => (
-                <GuessRow key={evaluation.id} evaluation={evaluation} />
-              ))
-            )}
+
+              {/* Lista de Palpites */}
+              <div className="space-y-2 sm:space-y-2.5 mt-1">
+                {evaluations.length === 0 ? (
+                  <div className="py-12 sm:py-16 text-center text-gray-400 dark:text-gray-600 space-y-2">
+                    <Music size={32} className="mx-auto opacity-30 animate-pulse sm:w-9 sm:h-9" />
+                    <p className="text-xs sm:text-sm font-medium">
+                      Nenhum palpite enviado ainda.
+                    </p>
+                    <p className="text-[11px] sm:text-xs opacity-75 max-w-xs sm:max-w-md mx-auto">
+                      Digite qualquer banda clássica no campo acima para começar a receber as dicas!
+                    </p>
+                  </div>
+                ) : (
+                  evaluations.map((evaluation) => (
+                    <GuessRow key={evaluation.id} evaluation={evaluation} />
+                  ))
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </main>
