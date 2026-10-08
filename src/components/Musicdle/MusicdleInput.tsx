@@ -12,6 +12,7 @@ interface MusicdleInputProps {
   guessedIds: string[];
   onSelectBand: (band: BandData) => void;
   disabled?: boolean;
+  disabledPlaceholder?: string;
 }
 
 export const MusicdleInput: React.FC<MusicdleInputProps> = ({
@@ -19,6 +20,7 @@ export const MusicdleInput: React.FC<MusicdleInputProps> = ({
   guessedIds,
   onSelectBand,
   disabled = false,
+  disabledPlaceholder,
 }) => {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -131,7 +133,7 @@ export const MusicdleInput: React.FC<MusicdleInputProps> = ({
           disabled={disabled || isEnriching}
           placeholder={
             disabled
-              ? "Desafio encerrado!"
+              ? disabledPlaceholder || "Desafio encerrado!"
               : isEnriching
               ? "Identificando atributos do artista..."
               : "Digite qualquer banda (Bad Omens, Fresno, BMTH, Queen...)"
