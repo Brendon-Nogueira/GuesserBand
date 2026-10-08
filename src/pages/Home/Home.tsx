@@ -112,7 +112,7 @@ const Home: React.FC = () => {
               </span>
             </div>
             <h3 className="text-xl font-extrabold tracking-tight mb-1 text-gray-900 dark:text-white flex items-center gap-1.5">
-              Musicdle (Loldle)
+              Musicdle (dle)
             </h3>
             <p className="text-xs sm:text-sm text-subtext-light dark:text-subtext-dark mb-4">
               Adivinhe a banda através de pistas de atributos: Gênero, País de Origem, Ano de Formação e Integrantes!
